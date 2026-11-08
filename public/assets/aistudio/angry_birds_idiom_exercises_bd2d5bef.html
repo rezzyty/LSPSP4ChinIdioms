@@ -1,0 +1,2457 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成語保衛戰：憤怒鳥大挑戰</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #87CEEB; /* Sky blue background */
+            background-image: radial-gradient(circle, #ffffff 10%, transparent 10%), radial-gradient(circle, #ffffff 10%, transparent 10%);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        .angry-font {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .btn-game {
+            background: linear-gradient(to bottom, #ff4d4d, #cc0000);
+            border: 3px solid #660000;
+            box-shadow: 0 4px 0 #660000, 0 8px 10px rgba(0,0,0,0.3);
+            transition: all 0.1s;
+        }
+        
+        .btn-game:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #660000, 0 4px 5px rgba(0,0,0,0.3);
+        }
+
+        .btn-option {
+            background: linear-gradient(to bottom, #ffffff, #e0e0e0);
+            border: 3px solid #666;
+            box-shadow: 0 4px 0 #666, 0 5px 10px rgba(0,0,0,0.2);
+            color: #333;
+            transition: all 0.1s;
+        }
+
+        .btn-option:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #666, 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .btn-option.selected {
+            background: linear-gradient(to bottom, #ffff99, #ffcc00);
+            border-color: #cc9900;
+            box-shadow: 0 4px 0 #cc9900;
+        }
+
+        .btn-option.correct {
+            background: linear-gradient(to bottom, #a3ffaa, #4dff5e);
+            border-color: #009914;
+            box-shadow: 0 4px 0 #009914;
+        }
+
+        .btn-option.wrong {
+            background: linear-gradient(to bottom, #ffa3a3, #ff4d4d);
+            border-color: #990000;
+            box-shadow: 0 4px 0 #990000;
+        }
+
+        .wood-panel {
+            background-color: #d2b48c;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(0,0,0,0.05) 10px,
+                rgba(0,0,0,0.05) 20px
+            );
+            border: 4px solid #8b4513;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-coin {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .coin-anim {
+            animation: pulse-coin 0.5s ease-in-out;
+        }
+
+        @keyframes fly-in {
+            0% { transform: translateX(-100vw) rotate(-360deg); opacity: 0; }
+            100% { transform: translateX(0) rotate(0deg); opacity: 1; }
+        }
+
+        .bird-fly-in {
+            animation: fly-in 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        @keyframes pop {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pop-in {
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* SVG Bird specific styles */
+        .bird-svg { width: 100%; height: 100%; }
+        
+        /* Particle effects for celebration */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center overflow-hidden">
+
+    <svg width="0" height="0" class="hidden">
+        <defs>
+            <!-- 1. Red Bird (Standard) -->
+            <g id="bird-red">
+                <circle cx="50" cy="50" r="45" fill="#e3000f"/>
+                <path d="M 20 80 Q 50 100 80 80" fill="#f4e0c4"/>
+                <circle cx="35" cy="45" r="10" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="black"/>
+                <circle cx="65" cy="45" r="10" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="black"/>
+                <path d="M 20 30 L 45 40 L 45 35 Z" fill="black"/>
+                <path d="M 80 30 L 55 40 L 55 35 Z" fill="black"/>
+                <path d="M 40 60 L 60 60 L 50 75 Z" fill="#ffcc00"/>
+                <path d="M 45 10 Q 50 0 55 10" fill="#e3000f" stroke="black" stroke-width="2"/>
+            </g>
+            <!-- 2. Yellow Bird (Speed) -->
+            <g id="bird-yellow">
+                <polygon points="50,10 10,90 90,90" fill="#ffd600"/>
+                <path d="M 20 90 Q 50 100 80 90" fill="#ffffff"/>
+                <circle cx="40" cy="60" r="8" fill="white"/>
+                <circle cx="40" cy="60" r="3" fill="black"/>
+                <circle cx="60" cy="60" r="8" fill="white"/>
+                <circle cx="60" cy="60" r="3" fill="black"/>
+                <path d="M 25 45 L 45 55 L 45 50 Z" fill="#cc0000"/>
+                <path d="M 75 45 L 55 55 L 55 50 Z" fill="#cc0000"/>
+                <path d="M 45 70 L 55 70 L 50 85 Z" fill="#ff9900"/>
+                <path d="M 50 10 L 45 0 L 55 5 Z" fill="black"/>
+            </g>
+            <!-- 3. Black Bird (Bomb) -->
+            <g id="bird-black">
+                <circle cx="50" cy="55" r="40" fill="#1a1a1a"/>
+                <path d="M 30 85 Q 50 100 70 85" fill="#999999"/>
+                <circle cx="35" cy="50" r="8" fill="white"/>
+                <circle cx="37" cy="50" r="3" fill="black"/>
+                <circle cx="65" cy="50" r="8" fill="white"/>
+                <circle cx="63" cy="50" r="3" fill="black"/>
+                <path d="M 25 35 L 45 45 L 45 40 Z" fill="#ffcc00"/>
+                <path d="M 75 35 L 55 45 L 55 40 Z" fill="#ffcc00"/>
+                <circle cx="50" cy="65" r="5" fill="#ff9900"/>
+                <path d="M 50 15 Q 50 5 60 5" fill="none" stroke="#ffcc00" stroke-width="4"/>
+                <circle cx="60" cy="5" r="4" fill="#ff0000"/>
+            </g>
+            <!-- 4. Blue Bird (Split) -->
+            <g id="bird-blue">
+                <circle cx="50" cy="50" r="30" fill="#66ccff"/>
+                <path d="M 35 70 Q 50 85 65 70" fill="#ffffff"/>
+                <circle cx="40" cy="45" r="6" fill="white"/>
+                <circle cx="40" cy="45" r="2" fill="black"/>
+                <circle cx="60" cy="45" r="6" fill="white"/>
+                <circle cx="60" cy="45" r="2" fill="black"/>
+                <path d="M 45 55 L 55 55 L 50 65 Z" fill="#ffcc00"/>
+                <path d="M 45 20 Q 50 15 55 20" fill="none" stroke="#003366" stroke-width="3"/>
+            </g>
+            <!-- 5. White Bird (Egg) -->
+            <g id="bird-white">
+                <ellipse cx="50" cy="50" rx="40" ry="45" fill="#ffffff"/>
+                <circle cx="35" cy="40" r="7" fill="black"/>
+                <circle cx="35" cy="40" r="2" fill="white"/>
+                <circle cx="65" cy="40" r="7" fill="black"/>
+                <circle cx="65" cy="40" r="2" fill="white"/>
+                <path d="M 25 25 L 40 30 L 40 27 Z" fill="#ff9999"/>
+                <path d="M 75 25 L 60 30 L 60 27 Z" fill="#ff9999"/>
+                <path d="M 40 55 L 60 55 L 50 70 Z" fill="#ffcc00"/>
+            </g>
+            <!-- 6. Green Bird (Boomerang) -->
+            <g id="bird-green">
+                <path d="M 10 50 Q 50 90 90 50 Q 50 10 10 50" fill="#33cc33"/>
+                <circle cx="35" cy="50" r="7" fill="white"/>
+                <circle cx="35" cy="50" r="2" fill="black"/>
+                <circle cx="65" cy="50" r="7" fill="white"/>
+                <circle cx="65" cy="50" r="2" fill="black"/>
+                <path d="M 10 50 L 30 50 L 20 60 Z" fill="#ffcc00"/>
+                <path d="M 45 15 Q 50 5 55 15" fill="none" stroke="black" stroke-width="2"/>
+            </g>
+            <!-- 7. Big Red Bird (Terence) -->
+            <g id="bird-bigred">
+                <circle cx="50" cy="50" r="50" fill="#990000"/>
+                <path d="M 10 80 Q 50 100 90 80" fill="#e6ccb3"/>
+                <circle cx="30" cy="40" r="8" fill="white"/>
+                <circle cx="30" cy="40" r="2" fill="black"/>
+                <circle cx="70" cy="40" r="8" fill="white"/>
+                <circle cx="70" cy="40" r="2" fill="black"/>
+                <path d="M 15 25 L 45 35 L 45 30 Z" fill="black"/>
+                <path d="M 85 25 L 55 35 L 55 30 Z" fill="black"/>
+                <path d="M 40 60 L 60 60 L 50 80 Z" fill="#ff9900"/>
+            </g>
+             <!-- 8. Pink Bird (Stella) -->
+            <g id="bird-pink">
+                <circle cx="50" cy="50" r="35" fill="#ff66b2"/>
+                <path d="M 25 75 Q 50 90 75 75" fill="#ffe6f2"/>
+                <circle cx="35" cy="45" r="9" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="#0066cc"/>
+                <circle cx="65" cy="45" r="9" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="#0066cc"/>
+                <path d="M 45 60 L 55 60 L 50 70 Z" fill="#ffcc00"/>
+                <path d="M 40 10 Q 50 0 60 10" fill="none" stroke="#ff3399" stroke-width="4"/>
+            </g>
+            <!-- 9. Orange Bird (Bubbles) -->
+            <g id="bird-orange">
+                <circle cx="50" cy="50" r="30" fill="#ff9933"/>
+                <path d="M 30 70 Q 50 85 70 70" fill="#ffffff"/>
+                <circle cx="40" cy="40" r="6" fill="white"/>
+                <circle cx="40" cy="40" r="2" fill="black"/>
+                <circle cx="60" cy="40" r="6" fill="white"/>
+                <circle cx="60" cy="40" r="2" fill="black"/>
+                <path d="M 45 50 L 55 50 L 50 60 Z" fill="#ffcc00"/>
+            </g>
+            <!-- 10. Silver Bird -->
+            <g id="bird-silver">
+                 <polygon points="50,20 20,80 80,80" fill="#cccccc"/>
+                 <circle cx="40" cy="55" r="7" fill="white"/>
+                 <circle cx="40" cy="55" r="2" fill="black"/>
+                 <circle cx="60" cy="55" r="7" fill="white"/>
+                 <circle cx="60" cy="55" r="2" fill="black"/>
+                 <path d="M 45 65 L 55 65 L 50 75 Z" fill="#ff9900"/>
+                 <path d="M 45 10 Q 50 0 55 10" fill="none" stroke="black" stroke-width="2"/>
+            </g>
+
+            <!-- 11. Mighty Eagle -->
+            <g id="bird-eagle">
+                <ellipse cx="50" cy="50" rx="50" ry="45" fill="#5c3a21"/>
+                <path d="M 10 75 Q 50 100 90 75" fill="#ffffff"/>
+                <circle cx="35" cy="40" r="10" fill="white"/>
+                <circle cx="35" cy="40" r="3" fill="black"/>
+                <circle cx="65" cy="40" r="10" fill="white"/>
+                <circle cx="65" cy="40" r="3" fill="black"/>
+                <path d="M 15 25 L 45 35 L 45 30 Z" fill="black"/>
+                <path d="M 85 25 L 55 35 L 55 30 Z" fill="black"/>
+                <path d="M 30 50 L 70 50 L 50 85 Z" fill="#ffb700" stroke="#cc8800" stroke-width="2"/>
+            </g>
+            <!-- 12. Ice Bird -->
+            <g id="bird-ice">
+                <rect x="15" y="15" width="70" height="70" rx="15" fill="#aee2ff" stroke="#7ab8ff" stroke-width="3"/>
+                <circle cx="35" cy="40" r="8" fill="white"/>
+                <circle cx="35" cy="40" r="3" fill="black"/>
+                <circle cx="65" cy="40" r="8" fill="white"/>
+                <circle cx="65" cy="40" r="3" fill="black"/>
+                <path d="M 25 25 L 45 35 L 45 30 Z" fill="#0055aa"/>
+                <path d="M 75 25 L 55 35 L 55 30 Z" fill="#0055aa"/>
+                <path d="M 40 55 L 60 55 L 50 70 Z" fill="#ffcc00"/>
+                <polygon points="50,15 45,0 55,5" fill="#aee2ff"/>
+            </g>
+            <!-- 13. Melody -->
+            <g id="bird-melody">
+                <circle cx="50" cy="55" r="35" fill="#f4d03f"/>
+                <path d="M 25 75 Q 50 95 75 75" fill="#fdf2e9"/>
+                <circle cx="38" cy="45" r="8" fill="white"/>
+                <circle cx="38" cy="45" r="3" fill="black"/>
+                <circle cx="62" cy="45" r="8" fill="white"/>
+                <circle cx="62" cy="45" r="3" fill="black"/>
+                <path d="M 30 35 Q 40 30 45 38" fill="none" stroke="#e67e22" stroke-width="3"/>
+                <path d="M 70 35 Q 60 30 55 38" fill="none" stroke="#e67e22" stroke-width="3"/>
+                <path d="M 40 60 L 60 60 Q 50 75 40 60 Z" fill="#e67e22"/>
+                <!-- Musical note hair -->
+                <path d="M 50 20 L 50 5 L 65 10 L 65 15 L 53 10 L 53 20" fill="#d35400" stroke="#d35400" stroke-width="2"/>
+                <circle cx="48" cy="20" r="4" fill="#d35400"/>
+            </g>
+            <!-- 14. Tony -->
+            <g id="bird-tony">
+                <circle cx="50" cy="50" r="50" fill="#85c1e9"/>
+                <path d="M 10 80 Q 50 100 90 80" fill="#ffffff"/>
+                <circle cx="30" cy="40" r="8" fill="white"/>
+                <circle cx="30" cy="40" r="2" fill="black"/>
+                <circle cx="70" cy="40" r="8" fill="white"/>
+                <circle cx="70" cy="40" r="2" fill="black"/>
+                <path d="M 15 25 L 45 35 L 45 30 Z" fill="#1b4f72"/>
+                <path d="M 85 25 L 55 35 L 55 30 Z" fill="#1b4f72"/>
+                <path d="M 40 60 L 60 60 L 50 80 Z" fill="#f39c12"/>
+            </g>
+            <!-- 15. Ruby -->
+            <g id="bird-ruby">
+                <circle cx="50" cy="50" r="40" fill="#e74c3c"/>
+                <path d="M 25 75 Q 50 95 75 75" fill="#fdedec"/>
+                <circle cx="35" cy="45" r="9" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="black"/>
+                <circle cx="65" cy="45" r="9" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="black"/>
+                <!-- Eyelashes -->
+                <path d="M 26 40 L 20 35 M 28 38 L 24 30 M 32 36 L 30 28" stroke="black" stroke-width="2"/>
+                <path d="M 74 40 L 80 35 M 72 38 L 76 30 M 68 36 L 70 28" stroke="black" stroke-width="2"/>
+                <!-- Bow -->
+                <polygon points="50,15 35,5 35,25" fill="#f1c40f"/>
+                <polygon points="50,15 65,5 65,25" fill="#f1c40f"/>
+                <circle cx="50" cy="15" r="4" fill="#f39c12"/>
+                <path d="M 40 60 L 60 60 L 50 75 Z" fill="#f39c12"/>
+            </g>
+
+            <!-- 16. Leonard -->
+            <g id="bird-leonard">
+                <!-- Crown -->
+                <path d="M 25 15 L 35 30 L 50 5 L 65 30 L 75 15 L 70 35 L 30 35 Z" fill="#f1c40f" stroke="#d4ac0d" stroke-width="2"/>
+                <!-- Body -->
+                <circle cx="50" cy="55" r="40" fill="#77cc33"/>
+                <!-- Beard -->
+                <path d="M 15 55 Q 50 100 85 55 Q 75 75 50 85 Q 25 75 15 55 Z" fill="#2d4a13"/>
+                <!-- Snout -->
+                <ellipse cx="50" cy="60" rx="16" ry="12" fill="#559922"/>
+                <circle cx="43" cy="60" r="3" fill="#224400"/>
+                <circle cx="57" cy="60" r="3" fill="#224400"/>
+                <!-- Eyes -->
+                <circle cx="35" cy="40" r="7" fill="white"/>
+                <circle cx="35" cy="40" r="2" fill="black"/>
+                <circle cx="65" cy="40" r="7" fill="white"/>
+                <circle cx="65" cy="40" r="2" fill="black"/>
+                <!-- Eyebrows -->
+                <path d="M 22 35 Q 35 30 42 38" fill="none" stroke="#2d4a13" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 78 35 Q 65 30 58 38" fill="none" stroke="#2d4a13" stroke-width="4" stroke-linecap="round"/>
+            </g>
+
+            <!-- 17. Shade (Ghost Bird) -->
+            <g id="bird-shade">
+                <ellipse cx="50" cy="50" rx="40" ry="45" fill="#f8f9fa"/>
+                <!-- Dark spots on the back/side -->
+                <circle cx="20" cy="45" r="4" fill="#4a4a4a"/>
+                <circle cx="23" cy="60" r="5" fill="#4a4a4a"/>
+                <circle cx="18" cy="70" r="3" fill="#4a4a4a"/>
+                <!-- Eye rings and Eyes -->
+                <circle cx="38" cy="40" r="11" fill="none" stroke="#4a4a4a" stroke-width="2"/>
+                <circle cx="62" cy="40" r="11" fill="none" stroke="#4a4a4a" stroke-width="2"/>
+                <circle cx="38" cy="40" r="9" fill="#ff7f50"/>
+                <circle cx="62" cy="40" r="9" fill="#ff7f50"/>
+                <!-- Pupils/Glow -->
+                <circle cx="38" cy="40" r="3" fill="#ffffff"/>
+                <circle cx="62" cy="40" r="3" fill="#ffffff"/>
+                <!-- Beak -->
+                <path d="M 45 48 L 55 48 L 50 58 Z" fill="#f1c40f"/>
+                <!-- Head feathers with dark brown ends -->
+                <path d="M 35 15 Q 35 5 28 5" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 50 10 Q 50 0 45 -2" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 65 15 Q 65 5 72 5" fill="none" stroke="#4a4a4a" stroke-width="4" stroke-linecap="round"/>
+                <!-- Ghostly tail/bottom -->
+                <path d="M 30 85 Q 50 105 70 85 Q 60 95 50 90 Q 40 95 30 85 Z" fill="#e2e8f0"/>
+            </g>
+
+            <!-- 18. Bounci (Purple Bird) -->
+            <g id="bird-bounci">
+                <!-- Tail -->
+                <path d="M 25 50 L 5 40 L 15 55 L 2 60 L 15 65 L 5 75 L 25 70 Z" fill="#1a1a1a"/>
+                <!-- Body -->
+                <ellipse cx="50" cy="55" rx="35" ry="45" fill="#9333ea"/>
+                <!-- Belly -->
+                <path d="M 25 80 Q 50 105 75 80" fill="#d8b4fe"/>
+                <!-- Eyes -->
+                <circle cx="38" cy="45" r="8" fill="white"/>
+                <circle cx="38" cy="45" r="3" fill="#4b5563"/>
+                <circle cx="62" cy="45" r="8" fill="white"/>
+                <circle cx="62" cy="45" r="3" fill="#4b5563"/>
+                <!-- Eyebrows -->
+                <path d="M 25 40 L 45 48 L 45 42 Z" fill="black"/>
+                <path d="M 75 40 L 55 48 L 55 42 Z" fill="black"/>
+                <!-- Beak -->
+                <path d="M 40 60 L 60 60 L 50 75 Z" fill="#ffcc00"/>
+                <!-- Head feathers -->
+                <path d="M 50 10 Q 45 -5 40 5 Q 50 5 55 10" fill="none" stroke="#9333ea" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 50 10 Q 55 -5 65 5 Q 55 5 50 10" fill="none" stroke="#9333ea" stroke-width="4" stroke-linecap="round"/>
+            </g>
+
+            <!-- 19. Gale -->
+            <g id="bird-gale">
+                <!-- Crown -->
+                <path d="M 25 15 L 35 30 L 50 0 L 65 30 L 75 15 L 70 35 L 30 35 Z" fill="#f1c40f" stroke="#d4ac0d" stroke-width="2"/>
+                <!-- Body -->
+                <circle cx="50" cy="55" r="38" fill="#5e2a84"/>
+                <!-- Belly -->
+                <path d="M 20 75 Q 50 100 80 75" fill="#d7bde2"/>
+                <!-- Eyes -->
+                <circle cx="35" cy="45" r="9" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="#2c3e50"/>
+                <circle cx="65" cy="45" r="9" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="#2c3e50"/>
+                <!-- Eyeshadow/Makeup -->
+                <path d="M 25 40 Q 35 35 44 42" fill="none" stroke="#2980b9" stroke-width="4" stroke-linecap="round"/>
+                <path d="M 75 40 Q 65 35 56 42" fill="none" stroke="#2980b9" stroke-width="4" stroke-linecap="round"/>
+                <!-- Eyelashes -->
+                <path d="M 26 40 L 20 35 M 28 38 L 24 30" stroke="#2c3e50" stroke-width="2"/>
+                <path d="M 74 40 L 80 35 M 72 38 L 76 30" stroke="#2c3e50" stroke-width="2"/>
+                <!-- Beak -->
+                <path d="M 45 55 L 55 55 L 50 68 Z" fill="#f39c12"/>
+                <!-- Cape collar -->
+                <path d="M 12 55 Q 50 90 88 55" fill="none" stroke="#2c3e50" stroke-width="4"/>
+            </g>
+
+            <!-- 20. Shakira Bird -->
+            <g id="bird-shakira">
+                <!-- Hair (Back) -->
+                <path d="M 20 50 Q 10 70 20 90 Q 30 70 25 50" fill="#fcd34d"/>
+                <path d="M 80 50 Q 90 70 80 90 Q 70 70 75 50" fill="#fcd34d"/>
+                <!-- Body -->
+                <circle cx="50" cy="55" r="38" fill="#fb923c"/>
+                <!-- Belly -->
+                <path d="M 25 75 Q 50 95 75 75" fill="#ffedd5"/>
+                <!-- Hair (Front/Bangs) -->
+                <path d="M 50 17 Q 35 17 25 40 Q 40 25 50 25 Q 60 25 75 40 Q 65 17 50 17" fill="#fcd34d"/>
+                <path d="M 50 17 Q 60 10 70 25 Q 65 30 50 25" fill="#fde68a"/>
+                <path d="M 50 17 Q 40 10 30 25 Q 35 30 50 25" fill="#fde68a"/>
+                <!-- Eyes -->
+                <circle cx="38" cy="48" r="8" fill="white"/>
+                <circle cx="38" cy="48" r="3" fill="#78350f"/>
+                <circle cx="62" cy="48" r="8" fill="white"/>
+                <circle cx="62" cy="48" r="3" fill="#78350f"/>
+                <!-- Eyelashes -->
+                <path d="M 30 44 Q 25 40 20 42" fill="none" stroke="#000" stroke-width="2"/>
+                <path d="M 70 44 Q 75 40 80 42" fill="none" stroke="#000" stroke-width="2"/>
+                <!-- Beak -->
+                <path d="M 45 58 L 55 58 L 50 68 Z" fill="#f59e0b"/>
+                <!-- Pop Star accent (small star on cheek) -->
+                <polygon points="25,55 27,60 32,60 28,63 30,68 25,65 20,68 22,63 18,60 23,60" fill="#ec4899" transform="scale(0.5) translate(40, 55)"/>
+            </g>
+
+            <!-- 21. Jo the Bird (Superb Bird of Paradise) -->
+            <g id="bird-jo">
+                <circle cx="50" cy="55" r="40" fill="#1f2937"/>
+                <!-- Teal chest patch -->
+                <path d="M 25 70 Q 50 50 75 70 Q 50 100 25 70" fill="#0d9488"/>
+                <!-- Eyes -->
+                <circle cx="35" cy="45" r="8" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="#111827"/>
+                <circle cx="65" cy="45" r="8" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="#111827"/>
+                <!-- Beak -->
+                <path d="M 45 55 L 55 55 L 50 65 Z" fill="#fbbf24"/>
+                <!-- Teal crown/crescent -->
+                <path d="M 30 25 Q 50 0 70 25 Q 50 15 30 25" fill="#0d9488"/>
+                <!-- Cheeks -->
+                <circle cx="25" cy="50" r="4" fill="#fca5a5" opacity="0.6"/>
+                <circle cx="75" cy="50" r="4" fill="#fca5a5" opacity="0.6"/>
+            </g>
+
+            <!-- 22. Gordon -->
+            <g id="bird-gordon">
+                <!-- Spiky Hair -->
+                <polygon points="35,20 25,-5 40,10 50,-10 60,10 75,-5 65,20" fill="#1e40af"/>
+                <!-- Body (Blue) -->
+                <ellipse cx="50" cy="55" rx="45" ry="40" fill="#2563eb"/>
+                <!-- Belly -->
+                <path d="M 15 75 Q 50 100 85 75 Q 50 85 15 75 Z" fill="#e5e7eb"/>
+                <!-- Eyes -->
+                <circle cx="35" cy="45" r="8" fill="white"/>
+                <circle cx="35" cy="45" r="2.5" fill="black"/>
+                <circle cx="65" cy="45" r="8" fill="white"/>
+                <circle cx="65" cy="45" r="2.5" fill="black"/>
+                <!-- Eyebrows (Thick & Grumpy) -->
+                <path d="M 15 35 L 45 42 L 45 36 L 15 29 Z" fill="#1f2937"/>
+                <path d="M 85 35 L 55 42 L 55 36 L 85 29 Z" fill="#1f2937"/>
+                <!-- Beak -->
+                <path d="M 40 55 L 60 55 L 50 70 Z" fill="#f59e0b"/>
+            </g>
+
+            <!-- 23. Ollie -->
+            <g id="bird-ollie">
+                <!-- Hockey Stick -->
+                <line x1="80" y1="15" x2="65" y2="70" stroke="#d97706" stroke-width="5" stroke-linecap="round"/>
+                <line x1="65" y1="70" x2="90" y2="85" stroke="#111827" stroke-width="6" stroke-linecap="round"/>
+                <!-- Body (Black) -->
+                <circle cx="50" cy="55" r="32" fill="#1f2937"/>
+                <!-- Face/Belly (White) -->
+                <path d="M 23 45 Q 50 25 77 45 Q 82 65 65 80 Q 50 90 35 80 Q 18 65 23 45 Z" fill="#ffffff"/>
+                <!-- Eyes -->
+                <circle cx="38" cy="48" r="7" fill="white" stroke="#1f2937" stroke-width="1"/>
+                <circle cx="38" cy="48" r="2.5" fill="black"/>
+                <circle cx="62" cy="48" r="7" fill="white" stroke="#1f2937" stroke-width="1"/>
+                <circle cx="62" cy="48" r="2.5" fill="black"/>
+                <!-- Eyebrows (Black) -->
+                <path d="M 28 40 L 44 44" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 72 40 L 56 44" stroke="#111827" stroke-width="3" stroke-linecap="round"/>
+                <!-- Beak -->
+                <path d="M 45 55 L 55 55 L 50 68 Z" fill="#f59e0b"/>
+                <!-- Head tuft (Black & White) -->
+                <path d="M 50 23 Q 45 10 48 5 Q 55 10 50 23" fill="#1f2937"/>
+                <path d="M 48 24 Q 42 12 45 8 Q 50 15 48 24" fill="#ffffff"/>
+            </g>
+
+            <!-- 24. Bombom -->
+            <g id="bird-bombom">
+                <!-- Mini Bomb Body -->
+                <circle cx="50" cy="60" r="28" fill="#dc2626"/>
+                <!-- Belly -->
+                <path d="M 28 78 Q 50 92 72 78 Z" fill="#1a1a1a"/>
+                <!-- Eyes -->
+                <circle cx="40" cy="52" r="5" fill="white"/>
+                <circle cx="40" cy="52" r="2" fill="black"/>
+                <circle cx="60" cy="52" r="5" fill="white"/>
+                <circle cx="60" cy="52" r="2" fill="black"/>
+                <!-- Cute eyebrows -->
+                <path d="M 35 45 Q 40 43 45 47" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M 65 45 Q 60 43 55 47" fill="none" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+                <!-- Beak -->
+                <polygon points="45,62 55,62 50,70" fill="#f59e0b"/>
+                <!-- Fuse -->
+                <path d="M 50 32 Q 45 22 55 12" fill="none" stroke="#1a1a1a" stroke-width="2"/>
+                <circle cx="55" cy="12" r="3" fill="#fcd34d"/>
+            </g>
+
+            <!-- 25. Rusty -->
+            <g id="bird-rusty">
+                <!-- Blue Sword -->
+                <g transform="translate(65, 45) rotate(20)">
+                    <!-- Blade -->
+                    <polygon points="10,0 20,0 15,-40" fill="#3b82f6" stroke="#1e3a8a" stroke-width="2"/>
+                    <!-- Blade Highlight -->
+                    <polygon points="10,0 15,0 15,-40" fill="#93c5fd"/>
+                    <!-- Crossguard -->
+                    <rect x="2" y="0" width="26" height="5" rx="2" fill="#fbbf24" stroke="#b45309" stroke-width="2"/>
+                    <!-- Grip -->
+                    <rect x="11" y="5" width="8" height="15" fill="#78350f" stroke="#451a03" stroke-width="1.5"/>
+                    <!-- Pommel -->
+                    <circle cx="15" cy="22" r="4" fill="#fbbf24" stroke="#b45309" stroke-width="1.5"/>
+                </g>
+
+                <!-- Body (Like Red) -->
+                <circle cx="45" cy="55" r="38" fill="#e3000f"/>
+                <!-- Belly -->
+                <path d="M 15 75 Q 45 100 75 75 Z" fill="#f4e0c4"/>
+                
+                <!-- Eyes -->
+                <circle cx="33" cy="52" r="7" fill="white"/>
+                <circle cx="33" cy="52" r="2.5" fill="black"/>
+                <circle cx="57" cy="52" r="7" fill="white"/>
+                <circle cx="57" cy="52" r="2.5" fill="black"/>
+                
+                <!-- Eyebrows -->
+                <path d="M 18 44 L 40 50 L 40 44 L 18 36 Z" fill="black"/>
+                <path d="M 72 44 L 50 50 L 50 44 L 72 36 Z" fill="black"/>
+                
+                <!-- Beak -->
+                <path d="M 37 62 L 53 62 L 45 74 Z" fill="#ffcc00"/>
+                
+                <!-- Metal Helmet -->
+                <!-- Helmet Dome -->
+                <path d="M 10 40 C 10 5 80 5 80 40" fill="#94a3b8" stroke="#475569" stroke-width="3"/>
+                <!-- Helmet Rim -->
+                <rect x="6" y="38" width="78" height="8" rx="4" fill="#64748b" stroke="#334155" stroke-width="2"/>
+                <!-- Nose Guard -->
+                <path d="M 42 46 L 48 46 L 48 58 L 42 58 Z" fill="#64748b" stroke="#334155" stroke-width="2"/>
+                <!-- Helmet Rivets -->
+                <circle cx="15" cy="42" r="1.5" fill="#cbd5e1"/>
+                <circle cx="75" cy="42" r="1.5" fill="#cbd5e1"/>
+            </g>
+
+            <!-- Collection Chicks -->
+            <!-- 1. Red Chick -->
+            <g id="chick-red">
+                <circle cx="50" cy="60" r="28" fill="#ff3333"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#ff3333" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 2. Orange Chick -->
+            <g id="chick-orange">
+                <circle cx="50" cy="60" r="28" fill="#ff9933"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffcc00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#ff9933" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 3. Yellow Chick -->
+            <g id="chick-yellow">
+                <circle cx="50" cy="60" r="28" fill="#ffdd00"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#ffdd00" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 4. Light Green Chick -->
+            <g id="chick-lightgreen">
+                <circle cx="50" cy="60" r="28" fill="#99ff66"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#99ff66" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 5. Green Chick -->
+            <g id="chick-green">
+                <circle cx="50" cy="60" r="28" fill="#33cc33"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#33cc33" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 6. Light Blue Chick -->
+            <g id="chick-lightblue">
+                <circle cx="50" cy="60" r="28" fill="#66ccff"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#66ccff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 7. Blue Chick -->
+            <g id="chick-blue">
+                <circle cx="50" cy="60" r="28" fill="#3366ff"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#3366ff" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 8. Purple Chick -->
+            <g id="chick-purple">
+                <circle cx="50" cy="60" r="28" fill="#9933cc"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#9933cc" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 9. Pink Chick -->
+            <g id="chick-pink">
+                <circle cx="50" cy="60" r="28" fill="#ff99cc"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#ff99cc" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 10. Dark Pink Chick -->
+            <g id="chick-darkpink">
+                <circle cx="50" cy="60" r="28" fill="#cc0066"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#cc0066" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            
+            <!-- 11. Black Chick -->
+            <g id="chick-black">
+                <circle cx="50" cy="60" r="28" fill="#333333"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffcc00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#333333" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 12. White Chick -->
+            <g id="chick-white">
+                <circle cx="50" cy="60" r="28" fill="#fcfcfc" stroke="#dddddd" stroke-width="1.5"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#cccccc" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 13. Grey Chick -->
+            <g id="chick-grey">
+                <circle cx="50" cy="60" r="28" fill="#999999"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#999999" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 14. Brown Chick -->
+            <g id="chick-brown">
+                <circle cx="50" cy="60" r="28" fill="#8b4513"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffcc00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#8b4513" stroke-width="4" stroke-linecap="round"/>
+            </g>
+            <!-- 15. Ochre Chick -->
+            <g id="chick-ochre">
+                <circle cx="50" cy="60" r="28" fill="#cc7722"/>
+                <path d="M 30 75 Q 50 95 70 75" fill="#ffffff" opacity="0.8"/>
+                <circle cx="42" cy="55" r="5.5" fill="white"/><circle cx="42" cy="55" r="2.5" fill="black"/>
+                <circle cx="58" cy="55" r="5.5" fill="white"/><circle cx="58" cy="55" r="2.5" fill="black"/>
+                <path d="M 46 62 L 54 62 L 50 68 Z" fill="#ffaa00"/>
+                <path d="M 50 32 Q 55 22 60 27" fill="none" stroke="#cc7722" stroke-width="4" stroke-linecap="round"/>
+            </g>
+
+            <!-- Cat Hat Accessory -->
+            <g id="hat-cat">
+                <!-- Base beanie -->
+                <path d="M 25 35 Q 50 -5 75 35 Q 50 45 25 35" fill="#fcd34d" stroke="#d97706" stroke-width="2"/>
+                <!-- Ears -->
+                <polygon points="30,20 20,0 45,15" fill="#fcd34d" stroke="#d97706" stroke-width="2"/>
+                <polygon points="31,18 24,7 39,15" fill="#fca5a5"/>
+                <polygon points="70,20 80,0 55,15" fill="#fcd34d" stroke="#d97706" stroke-width="2"/>
+                <polygon points="69,18 76,7 61,15" fill="#fca5a5"/>
+                <!-- Face Details -->
+                <circle cx="40" cy="25" r="2.5" fill="#4b5563"/>
+                <circle cx="60" cy="25" r="2.5" fill="#4b5563"/>
+                <path d="M 45 28 Q 50 32 55 28" fill="none" stroke="#4b5563" stroke-width="1.5"/>
+                <ellipse cx="50" cy="27" rx="2" ry="1.5" fill="#ef4444"/>
+            </g>
+
+            <!-- Dog Hat Accessory -->
+            <g id="hat-dog">
+                <path d="M 25 35 Q 50 -5 75 35 Q 50 45 25 35" fill="#8b4513" stroke="#5c2e0b" stroke-width="2"/>
+                <path d="M 25 25 C 10 25 15 55 25 50" fill="#5c2e0b" stroke="#3e1f07" stroke-width="2"/>
+                <path d="M 75 25 C 90 25 85 55 75 50" fill="#5c2e0b" stroke="#3e1f07" stroke-width="2"/>
+                <circle cx="42" cy="20" r="3" fill="white"/>
+                <circle cx="58" cy="20" r="3" fill="white"/>
+                <circle cx="42" cy="20" r="1.5" fill="black"/>
+                <circle cx="58" cy="20" r="1.5" fill="black"/>
+                <ellipse cx="50" cy="26" rx="4" ry="2.5" fill="#3b1f09"/>
+            </g>
+
+            <!-- Transformer Hat Accessory -->
+            <g id="hat-transformer">
+                <polygon points="20,15 25,10 25,35 20,35" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>
+                <polygon points="80,15 75,10 75,35 80,35" fill="#94a3b8" stroke="#475569" stroke-width="1.5"/>
+                <path d="M 25 35 L 25 15 L 40 5 L 60 5 L 75 15 L 75 35 Q 50 45 25 35" fill="#1e3a8a" stroke="#1e40af" stroke-width="2"/>
+                <polygon points="45,5 55,5 50,-8" fill="#dc2626" stroke="#991b1b" stroke-width="1.5"/>
+                <polygon points="48,5 52,5 50,-2" fill="#fbbf24"/>
+                <path d="M 35 20 L 50 28 L 65 20 L 50 24 Z" fill="#60a5fa"/>
+                <path d="M 25 25 L 35 25 L 35 35 L 25 35 Z" fill="#1d4ed8"/>
+                <path d="M 75 25 L 65 25 L 65 35 L 75 35 Z" fill="#1d4ed8"/>
+            </g>
+
+            <!-- Shades (Sunglasses) Accessory -->
+            <g id="hat-shades">
+                <!-- Frame -->
+                <path d="M 22 35 L 45 38 L 47 38 L 53 38 L 55 38 L 78 35 L 75 48 L 55 48 L 53 42 L 47 42 L 45 48 L 25 48 Z" fill="#1a1a1a" stroke="#000000" stroke-width="2"/>
+                <!-- Lenses -->
+                <path d="M 25 38 L 43 40 L 42 46 L 27 46 Z" fill="#4d4d4d"/>
+                <path d="M 57 40 L 75 38 L 73 46 L 58 46 Z" fill="#4d4d4d"/>
+                <!-- Reflection -->
+                <path d="M 27 40 L 35 40 L 30 45 Z" fill="#ffffff" opacity="0.4"/>
+                <path d="M 59 40 L 67 40 L 62 45 Z" fill="#ffffff" opacity="0.4"/>
+                <!-- Arms -->
+                <path d="M 22 35 Q 15 35 10 40" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+                <path d="M 78 35 Q 85 35 90 40" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+            </g>
+
+            <!-- Coin Icon -->
+            <g id="icon-coin">
+                <circle cx="50" cy="50" r="45" fill="#ffd700" stroke="#b8860b" stroke-width="5"/>
+                <circle cx="50" cy="50" r="35" fill="#ffec8b"/>
+                <text x="50" y="65" font-family="Arial" font-weight="bold" font-size="40" fill="#b8860b" text-anchor="middle">$</text>
+            </g>
+            <!-- Gem Icon -->
+            <g id="icon-gem">
+                <polygon points="50,10 90,40 50,90 10,40" fill="#00ffcc" stroke="#009999" stroke-width="4"/>
+                <polygon points="50,15 80,40 50,80 20,40" fill="#ccffff"/>
+            </g>
+            <!-- Pearl Icon -->
+            <radialGradient id="pearl-grad" cx="30%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#ffb3e6"/>
+                <stop offset="50%" stop-color="#ff3399"/>
+                <stop offset="100%" stop-color="#cc0066"/>
+            </radialGradient>
+            <g id="icon-pearl">
+                <circle cx="50" cy="50" r="45" fill="url(#pearl-grad)" stroke="#ff007f" stroke-width="2"/>
+                <ellipse cx="35" cy="30" rx="15" ry="10" fill="#ffe6f2" opacity="0.8" transform="rotate(-45 35 30)"/>
+                <circle cx="70" cy="70" r="8" fill="#cc0066" opacity="0.6"/>
+            </g>
+            <!-- Leaf Icon -->
+            <g id="icon-leaf">
+                <path d="M50,90 C50,90 10,70 10,40 C10,20 30,10 50,10 C70,10 90,20 90,40 C90,70 50,90 50,90 Z" fill="#4ade80" stroke="#15803d" stroke-width="4"/>
+                <path d="M50,90 L50,15" stroke="#15803d" stroke-width="4" fill="none"/>
+                <path d="M50,70 L30,50" stroke="#15803d" stroke-width="4" fill="none"/>
+                <path d="M50,55 L70,35" stroke="#15803d" stroke-width="4" fill="none"/>
+                <path d="M50,40 L35,25" stroke="#15803d" stroke-width="4" fill="none"/>
+            </g>
+            <!-- Slingshot -->
+            <g id="slingshot">
+                <path d="M 40 100 L 40 40 L 20 10 L 30 10 L 45 35 L 60 10 L 70 10 L 50 40 L 50 100 Z" fill="#8b4513"/>
+                <rect x="35" y="95" width="20" height="5" fill="#5c2e0b"/>
+            </g>
+            <!-- Pig Target -->
+            <g id="pig">
+                <circle cx="50" cy="50" r="45" fill="#77cc33"/>
+                <ellipse cx="30" cy="20" rx="10" ry="15" fill="#77cc33"/>
+                <ellipse cx="70" cy="20" rx="10" ry="15" fill="#77cc33"/>
+                <circle cx="35" cy="45" r="8" fill="white"/>
+                <circle cx="35" cy="45" r="3" fill="black"/>
+                <circle cx="65" cy="45" r="8" fill="white"/>
+                <circle cx="65" cy="45" r="3" fill="black"/>
+                <ellipse cx="50" cy="65" rx="15" ry="10" fill="#559922"/>
+                <circle cx="45" cy="65" r="3" fill="#224400"/>
+                <circle cx="55" cy="65" r="3" fill="#224400"/>
+            </g>
+        </defs>
+    </svg>
+
+    <div id="hud" class="fixed top-0 left-0 w-full p-4 flex justify-between items-start z-50 pointer-events-none">
+        <!-- Back Button -->
+        <button id="btn-back" class="hidden pointer-events-auto btn-game text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl" onclick="showScreen('home')">
+            ←
+        </button>
+        <div id="hud-spacer" class="w-12"></div> <!-- Spacer for flex layout -->
+
+        <!-- Currency Display -->
+        <div class="flex flex-wrap justify-end gap-2 md:gap-4 pointer-events-auto max-w-[70vw]">
+            <div class="wood-panel px-2 md:px-4 py-2 rounded-xl flex items-center gap-1 md:gap-2">
+                <svg viewBox="0 0 100 100" class="w-6 h-6 md:w-8 md:h-8"><use href="#icon-coin"></use></svg>
+                <span id="coin-display" class="angry-font text-white text-lg md:text-xl">0</span>
+            </div>
+            <div class="wood-panel px-2 md:px-4 py-2 rounded-xl flex items-center gap-1 md:gap-2">
+                <svg viewBox="0 0 100 100" class="w-6 h-6 md:w-8 md:h-8"><use href="#icon-gem"></use></svg>
+                <span id="gem-display" class="angry-font text-white text-lg md:text-xl">0</span>
+            </div>
+            <div class="wood-panel px-2 md:px-4 py-2 rounded-xl flex items-center gap-1 md:gap-2">
+                <svg viewBox="0 0 100 100" class="w-6 h-6 md:w-8 md:h-8"><use href="#icon-pearl"></use></svg>
+                <span id="pearl-display" class="angry-font text-white text-lg md:text-xl">0</span>
+            </div>
+            <div class="wood-panel px-2 md:px-4 py-2 rounded-xl flex items-center gap-1 md:gap-2">
+                <svg viewBox="0 0 100 100" class="w-6 h-6 md:w-8 md:h-8"><use href="#icon-leaf"></use></svg>
+                <span id="leaf-display" class="angry-font text-white text-lg md:text-xl">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-home" class="hidden w-full h-full flex flex-col items-center justify-center relative z-10">
+        <!-- Title area with floating birds -->
+        <div class="relative w-full max-w-2xl flex justify-center items-center mb-8 h-48">
+            <svg id="home-bird-1" viewBox="0 0 100 100" class="absolute left-10 top-10 w-24 h-24 floating drop-shadow-xl" style="animation-delay: 0s;"><use href="#bird-red"></use></svg>
+            <svg id="home-bird-2" viewBox="0 0 100 100" class="absolute right-10 top-0 w-20 h-20 floating drop-shadow-xl" style="animation-delay: 1s;"><use href="#bird-yellow"></use></svg>
+            <svg id="home-bird-3" viewBox="0 0 100 100" class="absolute left-1/4 bottom-0 w-28 h-28 floating drop-shadow-xl" style="animation-delay: 0.5s;"><use href="#bird-black"></use></svg>
+            
+            <h1 class="angry-font text-5xl md:text-7xl text-white text-center z-10">
+                成語保衛戰<br>
+                <span class="text-3xl md:text-5xl text-yellow-300">憤怒鳥大挑戰</span>
+            </h1>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 w-full max-w-lg px-4">
+            <button class="btn-game wood-panel rounded-2xl p-6 flex flex-col items-center justify-center gap-2" onclick="startSet(1)">
+                <span class="angry-font text-white text-2xl">關卡 一</span>
+                <span class="text-white text-sm font-bold">P.13 - P.17</span>
+            </button>
+            <button class="btn-game wood-panel rounded-2xl p-6 flex flex-col items-center justify-center gap-2" onclick="startSet(2)">
+                <span class="angry-font text-white text-2xl">關卡 二</span>
+                <span class="text-white text-sm font-bold">P.25 - P.28</span>
+            </button>
+            <button class="btn-game wood-panel rounded-2xl p-6 flex flex-col items-center justify-center gap-2" onclick="startSet(3)">
+                <span class="angry-font text-white text-2xl">關卡 三</span>
+                <span class="text-white text-sm font-bold">P.4 - P.8</span>
+            </button>
+            <button class="btn-game wood-panel rounded-2xl p-6 flex flex-col items-center justify-center gap-2" onclick="startSet(4)">
+                <span class="angry-font text-white text-2xl">關卡 四</span>
+                <span class="text-white text-sm font-bold">P.9 - P.12</span>
+            </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 mt-8">
+            <button class="btn-game rounded-full py-3 px-8 text-white angry-font text-xl flex items-center justify-center gap-2 shadow-lg" onclick="showScreen('collection')">
+                 查看鳥類圖鑑
+            </button>
+            <button class="btn-game rounded-full py-3 px-8 text-white angry-font text-xl flex items-center justify-center gap-2 shadow-lg" style="background: linear-gradient(to bottom, #a855f7, #7e22ce); border-color: #4c1d95; box-shadow: 0 4px 0 #4c1d95, 0 8px 10px rgba(0,0,0,0.3);" onclick="showScreen('shop')">
+                 <svg viewBox="0 0 100 100" class="w-6 h-6"><use href="#icon-coin"></use></svg> 進入商店
+            </button>
+        </div>
+    </div>
+
+    <!-- New Exercise Selection Screen -->
+    <div id="screen-exercise-select" class="hidden w-full h-full flex flex-col items-center pt-20 px-4 relative z-10">
+        <h2 id="exercise-set-title" class="angry-font text-4xl text-white mb-2">選擇練習</h2>
+        <div id="exercise-idiom-list" class="wood-panel bg-yellow-100 bg-opacity-90 px-6 py-2 rounded-xl mb-4 text-gray-800 font-bold text-center max-w-3xl flex flex-wrap justify-center gap-x-4 gap-y-1 shadow-md border-2 border-yellow-600">
+            <!-- Idioms list injected here -->
+        </div>
+        <div class="wood-panel w-full max-w-3xl rounded-3xl p-6 bg-opacity-90 overflow-y-auto max-h-[60vh]">
+            <p class="text-center text-yellow-800 font-bold mb-4">請選擇你要進行的練習 (每份 8-10 題)</p>
+            <div id="exercise-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-collection" class="hidden w-full h-full flex flex-col items-center pt-20 px-4 relative z-10">
+        <h2 class="angry-font text-4xl text-white mb-6">鳥類圖鑑</h2>
+        <div class="wood-panel w-full max-w-3xl rounded-3xl p-6 bg-opacity-90 overflow-y-auto max-h-[70vh]">
+            <p class="text-center text-yellow-800 font-bold mb-4">完成關卡解鎖更多鳥類夥伴！</p>
+            <div id="collection-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                <!-- Dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <!-- New Shop Screen -->
+    <div id="screen-shop" class="hidden w-full h-full flex flex-col items-center pt-20 px-4 relative z-10">
+        <h2 class="angry-font text-4xl text-white mb-6">夥伴商店</h2>
+        <div class="wood-panel w-full max-w-4xl rounded-3xl p-6 bg-opacity-90 overflow-y-auto max-h-[70vh]">
+            <p class="text-center text-yellow-800 font-bold mb-4">花費你收集的資源，招募更多強力的鳥類夥伴！</p>
+            <div id="shop-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                <!-- Shop items dynamically populated -->
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-game" class="hidden w-full h-full flex flex-col items-center pt-20 pb-10 px-4 relative z-10">
+        
+        <!-- Progress Bar -->
+        <div class="w-full max-w-2xl bg-gray-300 rounded-full h-4 mb-6 border-2 border-gray-500 relative overflow-hidden">
+            <div id="progress-bar" class="bg-gradient-to-r from-green-400 to-green-600 h-full w-0 transition-all duration-300"></div>
+            <div class="absolute inset-0 flex justify-between px-2 items-center text-xs font-bold text-gray-700 pointer-events-none" id="progress-text">
+                0/8
+            </div>
+        </div>
+
+        <!-- Battlefield Area (Slingshot & Pig) -->
+        <div class="w-full max-w-2xl h-48 mb-6 relative border-b-8 border-green-600 flex justify-between items-end px-4 sm:px-12 bg-blue-200/50 rounded-t-3xl border-x-4 border-t-4 border-blue-400">
+             <!-- Slingshot and Current Bird -->
+             <div class="relative w-24 h-32 flex justify-center items-end pb-2">
+                 <svg viewBox="0 0 100 100" class="absolute w-20 h-20 z-0 drop-shadow-md"><use href="#slingshot"></use></svg>
+                 <div id="current-bird-container" class="absolute z-10 bottom-16 left-1/2 transform -translate-x-1/2 w-12 h-12">
+                     <svg viewBox="0 0 100 100" id="current-bird-svg" class="w-full h-full bird-fly-in drop-shadow-lg"></svg>
+                 </div>
+             </div>
+
+             <!-- Enemy Pig -->
+             <div class="relative w-24 h-24 flex justify-center items-end pb-2">
+                 <div id="enemy-container" class="w-16 h-16 transition-transform drop-shadow-lg">
+                     <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#pig"></use></svg>
+                 </div>
+             </div>
+        </div>
+
+        <!-- Question Area -->
+        <div class="wood-panel w-full max-w-2xl rounded-2xl p-6 mb-6">
+            <h3 id="question-text" class="text-xl md:text-2xl font-bold text-center text-gray-900 leading-relaxed">
+                <!-- Question loaded here -->
+            </h3>
+        </div>
+
+        <!-- Options Area -->
+        <div id="options-container" class="grid grid-cols-2 gap-4 w-full max-w-2xl">
+            <!-- Options loaded here -->
+        </div>
+
+        <!-- Feedback Overlay (Hidden by default) -->
+        <div id="feedback-overlay" class="hidden absolute inset-0 flex items-center justify-center z-50 bg-black/50 backdrop-blur-sm">
+            <div id="feedback-panel" class="wood-panel p-8 rounded-3xl flex flex-col items-center transform scale-0 transition-transform duration-300">
+                <h2 id="feedback-title" class="angry-font text-5xl mb-4 text-white">正確!</h2>
+                <div class="flex gap-6 mb-6">
+                    <div class="flex flex-col items-center pop-in" style="animation-delay: 0.2s">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12"><use href="#icon-coin"></use></svg>
+                        <span class="angry-font text-white text-2xl mt-1" id="reward-coins">+10</span>
+                    </div>
+                    <div id="reward-gem-container" class="flex flex-col items-center hidden pop-in" style="animation-delay: 0.4s">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12"><use href="#icon-gem"></use></svg>
+                        <span class="angry-font text-white text-2xl mt-1">+1</span>
+                    </div>
+                    <div id="reward-pearl-container" class="flex flex-col items-center hidden pop-in" style="animation-delay: 0.6s">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12"><use href="#icon-pearl"></use></svg>
+                        <span class="angry-font text-white text-2xl mt-1">+1</span>
+                    </div>
+                    <div id="reward-leaf-container" class="flex flex-col items-center hidden pop-in" style="animation-delay: 0.8s">
+                        <svg viewBox="0 0 100 100" class="w-12 h-12"><use href="#icon-leaf"></use></svg>
+                        <span class="angry-font text-white text-2xl mt-1">+1</span>
+                    </div>
+                </div>
+                <button class="btn-game px-8 py-3 rounded-full text-white angry-font text-xl" onclick="nextQuestion()">繼續</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Result & Review Screen -->
+    <div id="screen-result" class="hidden w-full h-full flex flex-col items-center pt-20 px-4 relative z-10 overflow-y-auto pb-10">
+        <h2 class="angry-font text-5xl mb-4 text-white" style="text-shadow: none;">關卡完成!</h2>
+        
+        <div class="wood-panel w-full max-w-3xl rounded-3xl p-6 bg-opacity-95 mb-6 flex flex-col items-center">
+            <div class="flex justify-center my-2" id="result-stars">
+                <!-- Stars appended here -->
+            </div>
+            <p id="result-score" class="text-3xl font-bold text-yellow-800 mb-2">得分: 0 / 8</p>
+            
+            <div class="flex gap-6 mb-4">
+                <div class="flex items-center gap-2">
+                    <svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#icon-coin"></use></svg>
+                    <span class="angry-font text-yellow-800 text-2xl" id="result-coins-earned">+0</span>
+                </div>
+                <div id="result-gem-container" class="flex items-center gap-2 hidden">
+                    <svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#icon-gem"></use></svg>
+                    <span class="angry-font text-yellow-800 text-2xl" id="result-gems-earned">+0</span>
+                </div>
+                <div id="result-pearl-container" class="flex items-center gap-2 hidden">
+                    <svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#icon-pearl"></use></svg>
+                    <span class="angry-font text-yellow-800 text-2xl" id="result-pearls-earned">+0</span>
+                </div>
+                <div id="result-leaf-container" class="flex items-center gap-2 hidden">
+                    <svg viewBox="0 0 100 100" class="w-8 h-8"><use href="#icon-leaf"></use></svg>
+                    <span class="angry-font text-yellow-800 text-2xl" id="result-leaves-earned">+0</span>
+                </div>
+            </div>
+
+            <div id="new-bird-alert" class="hidden flex flex-col items-center bg-blue-100 p-4 rounded-xl border-4 border-blue-400 w-full mt-2">
+                <p class="font-bold text-blue-800 mb-2 text-xl">解鎖新鳥類！</p>
+                <svg viewBox="0 0 100 100" id="unlocked-bird-svg" class="w-24 h-24 pop-in"></svg>
+            </div>
+        </div>
+
+        <div class="wood-panel w-full max-w-3xl rounded-3xl p-6 bg-opacity-95 mb-8 shadow-xl">
+            <h3 class="angry-font text-3xl text-center text-yellow-900 mb-6 border-b-4 border-yellow-700 pb-2" style="text-shadow: none;">題目回顧</h3>
+            <div id="review-list" class="flex flex-col gap-4">
+                <!-- Review items injected here -->
+            </div>
+        </div>
+
+        <button class="btn-game w-full max-w-sm py-4 rounded-full text-white angry-font text-2xl shadow-lg mb-10 flex-shrink-0" onclick="showScreen('exercise-select')">返回選單</button>
+    </div>
+
+    <!-- User ID Display -->
+    <div id="user-info" class="fixed bottom-2 left-2 z-50 hidden pointer-events-none">
+        <div class="bg-black/50 text-white text-xs px-3 py-1.5 rounded-xl font-bold shadow-lg" id="user-id-display"></div>
+    </div>
+
+    <!-- Secret Trigger for Parents (Bottom Right Corner) -->
+    <div id="secret-trigger" class="fixed bottom-0 right-0 w-24 h-24 z-[100]" onclick="handleSecretClick()"></div>
+
+    <!-- Admin/Parent Modal -->
+    <div id="admin-modal" class="hidden fixed inset-0 flex items-center justify-center z-[110] bg-black/70 backdrop-blur-sm">
+        <div class="wood-panel p-8 rounded-3xl flex flex-col items-center w-full max-w-md mx-4">
+            <h2 class="angry-font text-3xl mb-4 text-white">家長管理中心</h2>
+            
+            <div id="admin-login-panel" class="w-full flex flex-col items-center">
+                <p class="text-yellow-900 font-bold mb-4">請輸入家長密碼 (預設: 8888)</p>
+                <input type="password" id="admin-pin" class="w-full text-center text-2xl p-2 rounded-xl mb-4 border-4 border-yellow-700 focus:outline-none" placeholder="****">
+                <p id="admin-error" class="text-red-600 font-bold mb-4 hidden">密碼錯誤！</p>
+                <div class="flex gap-4">
+                    <button class="btn-option px-6 py-2 rounded-xl font-bold" onclick="closeAdminModal()">取消</button>
+                    <button class="btn-game px-6 py-2 rounded-xl text-white font-bold" onclick="verifyAdminPin()">解鎖</button>
+                </div>
+            </div>
+
+            <div id="admin-unlocked-panel" class="hidden w-full flex flex-col items-center">
+                <p class="text-yellow-900 font-bold mb-4 text-center">點擊按鈕為帳號增加資源：</p>
+                <div class="grid grid-cols-2 gap-4 w-full mb-6">
+                    <button class="btn-option flex flex-col items-center justify-center gap-1 p-3 rounded-xl hover:bg-yellow-50" onclick="adminAddCurrency('coins', 1000)">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10"><use href="#icon-coin"></use></svg> 
+                        <span class="font-bold text-gray-800">+1000 金幣</span>
+                    </button>
+                    <button class="btn-option flex flex-col items-center justify-center gap-1 p-3 rounded-xl hover:bg-cyan-50" onclick="adminAddCurrency('gems', 100)">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10"><use href="#icon-gem"></use></svg> 
+                        <span class="font-bold text-gray-800">+100 寶石</span>
+                    </button>
+                    <button class="btn-option flex flex-col items-center justify-center gap-1 p-3 rounded-xl hover:bg-pink-50" onclick="adminAddCurrency('pearls', 100)">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10"><use href="#icon-pearl"></use></svg> 
+                        <span class="font-bold text-gray-800">+100 珍珠</span>
+                    </button>
+                    <button class="btn-option flex flex-col items-center justify-center gap-1 p-3 rounded-xl hover:bg-green-50" onclick="adminAddCurrency('leaves', 100)">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10"><use href="#icon-leaf"></use></svg> 
+                        <span class="font-bold text-gray-800">+100 樹葉</span>
+                    </button>
+                </div>
+                <button class="btn-game w-full py-3 rounded-full text-white angry-font text-xl shadow-lg" onclick="closeAdminModal()">完成並關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
+        const firebaseConfig = JSON.parse(firebaseConfigStr);
+
+        let db, auth, userId;
+
+        function saveSession() {
+            localStorage.setItem('idiomCurrentScreen', state.currentScreen);
+            localStorage.setItem('idiomCurrentSet', state.currentSet);
+            localStorage.setItem('idiomCurrentExercise', state.currentExercise);
+            localStorage.setItem('idiomCurrentQIdx', state.currentQuestionIndex);
+            localStorage.setItem('idiomScore', state.score);
+            localStorage.setItem('idiomStreak', state.streak);
+            localStorage.setItem('idiomQuestions', JSON.stringify(state.questions));
+            localStorage.setItem('idiomUserAnswers', JSON.stringify(state.userAnswers));
+            localStorage.setItem('idiomTotalQuestions', state.totalQuestions);
+        }
+
+        let state = {
+            coins: parseInt(localStorage.getItem('idiomCoins')) || 0,
+            gems: parseInt(localStorage.getItem('idiomGems')) || 0,
+            pearls: parseInt(localStorage.getItem('idiomPearls')) || 0,
+            leaves: parseInt(localStorage.getItem('idiomLeaves')) || 0,
+            unlockedBirds: JSON.parse(localStorage.getItem('idiomBirds')) || ['bird-red'],
+            catHatUnlocked: localStorage.getItem('idiomCatHat') === 'true',
+            dogHatUnlocked: localStorage.getItem('idiomDogHat') === 'true',
+            transformerHatUnlocked: localStorage.getItem('idiomTransformerHat') === 'true',
+            shadesHatUnlocked: localStorage.getItem('idiomShadesHat') === 'true',
+            equippedHat: localStorage.getItem('idiomEquippedHat') || (localStorage.getItem('idiomCatHatEquip') !== 'false' && localStorage.getItem('idiomCatHat') === 'true' ? 'cat' : 'none'),
+            currentScreen: localStorage.getItem('idiomCurrentScreen') || 'home',
+            currentSet: parseInt(localStorage.getItem('idiomCurrentSet')) || 0,
+            currentExercise: parseInt(localStorage.getItem('idiomCurrentExercise')) || 0, 
+            currentQuestionIndex: parseInt(localStorage.getItem('idiomCurrentQIdx')) || 0,
+            score: parseInt(localStorage.getItem('idiomScore')) || 0,
+            streak: parseInt(localStorage.getItem('idiomStreak')) || 0,
+            questions: JSON.parse(localStorage.getItem('idiomQuestions')) || [],
+            userAnswers: JSON.parse(localStorage.getItem('idiomUserAnswers')) || [],
+            totalQuestions: parseInt(localStorage.getItem('idiomTotalQuestions')) || 0
+        };
+
+        const BIRD_TYPES = [
+            'bird-red', 'bird-yellow', 'bird-black', 'bird-blue', 'bird-white',
+            'bird-green', 'bird-bigred', 'bird-pink', 'bird-orange', 'bird-silver',
+            'bird-eagle', 'bird-ice', 'bird-melody', 'bird-tony', 'bird-ruby', 'bird-leonard', 'bird-shade', 'bird-bounci', 'bird-gale', 'bird-shakira', 'bird-jo',
+            'bird-gordon', 'bird-ollie', 'bird-bombom', 'bird-rusty',
+            'chick-red', 'chick-orange', 'chick-yellow', 'chick-lightgreen', 'chick-green', 
+            'chick-lightblue', 'chick-blue', 'chick-purple', 'chick-pink', 'chick-darkpink',
+            'chick-black', 'chick-white', 'chick-grey', 'chick-brown', 'chick-ochre'
+        ];
+
+        // Define the idioms for each set to display on the selection screen
+        const setIdioms = {
+            1: ["不假思索", "五體投地", "心直口快", "水落石出", "以卵擊石", "以貌取人", "出爾反爾", "仗勢欺人", "半途而廢", "功敗垂成"],
+            2: ["自知之明", "自暴自棄", "百感交集", "名列前茅", "名落孫山", "名副其實", "有備無患", "好逸惡勞", "同舟共濟", "老馬識途"],
+            3: ["一絲不苟", "一波三折", "一髮千鈞", "一鳴驚人", "一視同仁", "十拿九穩", "一竅不通", "九牛一毛", "人心惶惶", "一念之差", "一塌糊塗", "一望無際", "一貧如洗"],
+            4: ["人定勝天", "口是心非", "大顯身手", "大發雷霆", "千里鵝毛", "不知所措", "不厭其煩", "不屈不撓", "不倫不類", "不辭勞苦"]
+        };
+
+        // Complete exercise data with 8 exercises per set, 8-10 questions per exercise
+        const exerciseData = {
+            // Set 1: Based on P.13-P.17
+            1: {
+                title: "關卡 一 (P.13 - P.17)",
+                exercises: {
+                    1: [
+                        { q: "他在回答考官問題時__________，思維敏捷，令在場評審非常賞識。", a: "不假思索", options: ["不假思索", "出爾反爾", "水落石出", "半途而廢"] },
+                        { q: "這位魔術師的表演精彩絕倫，全場觀眾都佩服得__________。", a: "五體投地", options: ["以貌取人", "五體投地", "功敗垂成", "仗勢欺人"] },
+                        { q: "他雖然性格__________，有話直說，但大家都很喜歡他的率真。", a: "心直口快", options: ["心直口快", "不假思索", "出爾反爾", "五體投地"] },
+                        { q: "警方發揮偵查智慧，終於讓這宗懸案的真相__________。", a: "水落石出", options: ["半途而廢", "心直口快", "水落石出", "出爾反爾"] },
+                        { q: "憑他個人單薄的力量去對抗大型財團，簡直是__________。", a: "以卵擊石", options: ["以卵擊石", "不假思索", "仗勢欺人", "五體投地"] },
+                        { q: "選拔人才時應該注重實際能力與操守，切不可__________。", a: "以貌取人", options: ["出爾反爾", "以貌取人", "心直口快", "功敗垂成"] },
+                        { q: "你既然答應了協助籌辦活動，就不該__________、臨陣退縮。", a: "出爾反爾", options: ["半途而廢", "水落石出", "出爾反爾", "不假思索"] },
+                        { q: "那位惡霸仗著家中有錢有勢便在鄉里間__________，終被依法懲治。", a: "仗勢欺人", options: ["仗勢欺人", "以卵擊石", "五體投地", "以貌取人"] },
+                        { q: "學習語言需要日積月累，如果半路退縮、__________，是不會有進步的。", a: "半途而廢", options: ["半途而廢", "功敗垂成", "仗勢欺人", "以卵擊石"] },
+                        { q: "這支接力隊原本一路領先，可惜在最後衝刺時不幸跌倒，落得__________的結局。", a: "功敗垂成", options: ["水落石出", "功敗垂成", "五體投地", "以貌取人"] }
+                    ],
+                    2: [
+                        { q: "面對危機時，隊長__________地做出應變決策，帶領大家化險為夷。", a: "不假思索", options: ["不假思索", "五體投地", "心直口快", "水落石出"] },
+                        { q: "大師展示的精湛雕刻技藝，令人讚嘆不已、__________。", a: "五體投地", options: ["出爾反爾", "五體投地", "功敗垂成", "以貌取人"] },
+                        { q: "表哥發言向來__________，雖然偶爾會得罪人，但從不藏頭露尾。", a: "心直口快", options: ["仗勢欺人", "心直口快", "不假思索", "半途而廢"] },
+                        { q: "經過多方對質與調查，這場誤會終於__________，還了小明一個清白。", a: "水落石出", options: ["水落石出", "以卵擊石", "出爾反爾", "功敗垂成"] },
+                        { q: "小國若要硬撞強國的精銳大軍，只怕是__________、自取滅亡。", a: "以卵擊石", options: ["五體投地", "仗勢欺人", "以卵擊石", "半途而廢"] },
+                        { q: "評審提醒大家，音樂比賽要憑聲音打動人心，不能__________。", a: "以貌取人", options: ["以貌取人", "心直口快", "不假思索", "水落石出"] },
+                        { q: "企業經營講求誠信，若是__________，顧客自然會失去信任。", a: "出爾反爾", options: ["半途而廢", "出爾反爾", "功敗垂成", "以卵擊石"] },
+                        { q: "我們在學校要團結友愛，絕對不能憑藉身材高大而__________。", a: "仗勢欺人", options: ["仗勢欺人", "五體投地", "心直口快", "以貌取人"] },
+                        { q: "做事最忌諱__________，只有持之以恆才能嘗到成功的果實。", a: "半途而廢", options: ["半途而廢", "不假思索", "水落石出", "功敗垂成"] },
+                        { q: "這艘火箭在升空前最後數秒因系統故障而取消發射，令人大感__________。", a: "功敗垂成", options: ["功敗垂成", "以卵擊石", "出爾反爾", "仗勢欺人"] }
+                    ],
+                    3: [
+                        { q: "聽完題目後，他__________地舉手回答，而且答案完全正確。", a: "不假思索", options: ["不假思索", "出爾反爾", "水落石出", "半途而廢"] },
+                        { q: "科學家研發出新型能源技術，其卓越貢獻讓人佩服得__________。", a: "五體投地", options: ["以貌取人", "五體投地", "功敗垂成", "仗勢欺人"] },
+                        { q: "妹妹__________，常常把心裏的想法脫口而出，惹得大家哈哈大笑。", a: "心直口快", options: ["心直口快", "不假思索", "出爾反爾", "五體投地"] },
+                        { q: "謠言經過事實檢驗後破滅，事情的經過終於__________。", a: "水落石出", options: ["半途而廢", "心直口快", "水落石出", "出爾反爾"] },
+                        { q: "明知對方手握重兵還去強行攻打，無異於__________。", a: "以卵擊石", options: ["以卵擊石", "不假思索", "仗勢欺人", "五體投地"] },
+                        { q: "面試官態度公正客觀，絕不會因為求職者的穿著打扮而__________。", a: "以貌取人", options: ["出爾反爾", "以貌取人", "心直口快", "功敗垂成"] },
+                        { q: "一個人如果經常__________，說過的話算數，漸漸就會失去朋友。", a: "出爾反爾", options: ["半途而廢", "水落石出", "出爾反爾", "不假思索"] },
+                        { q: "那些__________的流氓在街上騷擾商家，很快就被警察逮捕了。", a: "仗勢欺人", options: ["仗勢欺人", "以卵擊石", "五體投地", "以貌取人"] },
+                        { q: "跑步比賽最需要堅強的意志，哪怕再累也不能__________。", a: "半途而廢", options: ["半途而廢", "功敗垂成", "仗勢欺人", "以卵擊石"] },
+                        { q: "這項實驗耗費了三年心血，最後一刻卻因停電而出錯，真是__________。", a: "功敗垂成", options: ["水落石出", "功敗垂成", "五體投地", "以貌取人"] }
+                    ],
+                    4: [
+                        { q: "記者詢問他的獲獎感言，他__________地表達了對父母和老師的感謝。", a: "不假思索", options: ["不假思索", "五體投地", "心直口快", "水落石出"] },
+                        { q: "這幅名畫線條細致、意境深遠，藝術大師的手筆確實令人__________。", a: "五體投地", options: ["出爾反爾", "五體投地", "功敗垂成", "以貌取人"] },
+                        { q: "他這人__________，心裏藏不住話，有什麼意見都會直接提出。", a: "心直口快", options: ["仗勢欺人", "心直口快", "不假思索", "半途而廢"] },
+                        { q: "調閱監視器畫面後，到底是誰打破玻璃終於__________。", a: "水落石出", options: ["水落石出", "以卵擊石", "出爾反爾", "功敗垂成"] },
+                        { q: "用輕巧的竹竿去抵擋滾落的巨石，簡直是__________。", a: "以卵擊石", options: ["五體投地", "仗勢欺人", "以卵擊石", "半途而廢"] },
+                        { q: "看人不能看外表，若憑外貌定優劣，很容易__________而錯失人才。", a: "以貌取人", options: ["以貌取人", "心直口快", "不假思索", "水落石出"] },
+                        { q: "他總是答應了事情又反悔，這種__________的態度令人難以配合。", a: "出爾反爾", options: ["半途而廢", "出爾反爾", "功敗垂成", "以卵擊石"] },
+                        { q: "仗著自己是資深員工就__________、排擠新人，是非常不道德的行為。", a: "仗勢欺人", options: ["仗勢欺人", "五體投地", "心直口快", "以貌取人"] },
+                        { q: "學習書法需要長期練習，如果三天打魚兩天曬網、__________，很難寫得出好字。", a: "半途而廢", options: ["半途而廢", "不假思索", "水落石出", "功敗垂成"] },
+                        { q: "登山隊距離峰頂只剩幾十公尺，卻因突然爆發暴風雪而不得不撤退，真是__________。", a: "功敗垂成", options: ["功敗垂成", "以卵擊石", "出爾反爾", "仗勢欺人"] }
+                    ],
+                    5: [
+                        { q: "遇到突發狀況時，警衛__________地按下了警報器，及時通知了大家。", a: "不假思索", options: ["不假思索", "出爾反爾", "水落石出", "半途而廢"] },
+                        { q: "主廚烹飪出的美味佳餚色香味俱全，讓美食家們佩服得__________。", a: "五體投地", options: ["以貌取人", "五體投地", "功敗垂成", "仗勢欺人"] },
+                        { q: "雖然叔叔性格__________，講話比較直接，但他心地非常善良。", a: "心直口快", options: ["心直口快", "不假思索", "出爾反爾", "五體投地"] },
+                        { q: "經理深入核對帳目後，資金流失的原因終於__________。", a: "水落石出", options: ["半途而廢", "心直口快", "水落石出", "出爾反爾"] },
+                        { q: "非要拿剛學武術的新手去挑戰武林高手，可謂是__________。", a: "以卵擊石", options: ["以卵擊石", "不假思索", "仗勢欺人", "五體投地"] },
+                        { q: "古人說「人不可貌相」，我們在生活中切忌__________。", a: "以貌取人", options: ["出爾反爾", "以貌取人", "心直口快", "功敗垂成"] },
+                        { q: "簽訂合約後就應該嚴格遵守，任何__________的行為都要承擔法律責任。", a: "出爾反爾", options: ["半途而廢", "水落石出", "出爾反爾", "不假思索"] },
+                        { q: "社會應當保護弱者，懲治那些倚官仗勢、__________的壞人。", a: "仗勢欺人", options: ["仗勢欺人", "以卵擊石", "五體投地", "以貌取人"] },
+                        { q: "做事情最怕虎頭蛇尾、__________，唯有堅持到底才能看到成效。", a: "半途而廢", options: ["半途而廢", "功敗垂成", "仗勢欺人", "以卵擊石"] },
+                        { q: "設計團隊耗時一年製作模型，不料在最後測試時損壞，令人嘆息__________。", a: "功敗垂成", options: ["水落石出", "功敗垂成", "五體投地", "以貌取人"] }
+                    ],
+                    6: [
+                        { q: "看見同伴落水，救生員__________地跳入水中將他救起。", a: "不假思索", options: ["不假思索", "五體投地", "心直口快", "水落石出"] },
+                        { q: "建築師設計的結構別具匠心，令同業專家無不讚嘆、__________。", a: "五體投地", options: ["出爾反爾", "五體投地", "功敗垂成", "以貌取人"] },
+                        { q: "他雖然有點__________，容易衝動說錯話，但為人十分坦誠。", a: "心直口快", options: ["仗勢欺人", "心直口快", "不假思索", "半途而廢"] },
+                        { q: "經過專案小組徹底徹查，這宗弊案的來龍去脈總算__________。", a: "水落石出", options: ["水落石出", "以卵擊石", "出爾反爾", "功敗垂成"] },
+                        { q: "以弱小的木舟去撞擊龐大的戰艦，完全是__________的愚蠢舉動。", a: "以卵擊石", options: ["五體投地", "仗勢欺人", "以卵擊石", "半途而廢"] },
+                        { q: "一位有修養的人，絕不會以衣著好壞來__________。", a: "以貌取人", options: ["以貌取人", "心直口快", "不假思索", "水落石出"] },
+                        { q: "建立信任需要很長時間，但一次__________的失信就可能將其毀於一旦。", a: "出爾反爾", options: ["半途而廢", "出爾反爾", "功敗垂成", "以卵擊石"] },
+                        { q: "學校嚴格禁止任何同學倚仗兄長勢力而__________的霸凌行為。", a: "仗勢欺人", options: ["仗勢欺人", "五體投地", "心直口快", "以貌取人"] },
+                        { q: "練習演奏樂器要有耐心，遇到瓶頸就__________是無法進步的。", a: "半途而廢", options: ["半途而廢", "不假思索", "水落石出", "功敗垂成"] },
+                        { q: "這部電影拍攝歷經艱辛，卻在上映前夕因版權糾紛無法播映，真是__________。", a: "功敗垂成", options: ["功敗垂成", "以卵擊石", "出爾反爾", "仗勢欺人"] }
+                    ],
+                    7: [
+                        { q: "對於原則問題，他__________地給出了否定的回答，展現出堅定的立場。", a: "不假思索", options: ["不假思索", "出爾反爾", "水落石出", "半途而廢"] },
+                        { q: "老前輩展示的神乎其技的書法，讓在場年輕後輩折服得__________。", a: "五體投地", options: ["以貌取人", "五體投地", "功敗垂成", "仗勢欺人"] },
+                        { q: "他性情爽朗、__________，有想法就會公開講出來，從不暗中算計。", a: "心直口快", options: ["心直口快", "不假思索", "出爾反爾", "五體投地"] },
+                        { q: "隨著相關證據陸續被揭露，事實真相漸漸__________。", a: "水落石出", options: ["半途而廢", "心直口快", "水落石出", "出爾反爾"] },
+                        { q: "缺乏裝備就冒然挑戰險峻懸崖，簡直是__________、自冒性命危險。", a: "以卵擊石", options: ["以卵擊石", "不假思索", "仗勢欺人", "五體投地"] },
+                        { q: "選拔優秀員工時，我們注重的是工作態度與才能，絕不__________。", a: "以貌取人", options: ["出爾反爾", "以貌取人", "心直口快", "功敗垂成"] },
+                        { q: "一個剛做完決定又立刻改變主意的人，會被大家認為是__________、不可靠的人。", a: "出爾反爾", options: ["半途而廢", "水落石出", "出爾反爾", "不假思索"] },
+                        { q: "仗著權勢地位去__________，終究會受到正義的審判。", a: "仗勢欺人", options: ["仗勢欺人", "以卵擊石", "五體投地", "以貌取人"] },
+                        { q: "無論遇到多大的困難，我們都要堅持下去，絕不__________。", a: "半途而廢", options: ["半途而廢", "功敗垂成", "仗勢欺人", "以卵擊石"] },
+                        { q: "運動員在決賽進行到最後一秒時被逆轉敗北，落得__________，令人遺憾。", a: "功敗垂成", options: ["水落石出", "功敗垂成", "五體投地", "以貌取人"] }
+                    ],
+                    8: [
+                        { q: "老師發問後，小華敏捷地__________回答出了解答，贏得掌聲。", a: "不假思索", options: ["不假思索", "五體投地", "心直口快", "水落石出"] },
+                        { q: "大師在舞台上的精湛舞蹈演譯，令全場觀眾佩服得__________。", a: "五體投地", options: ["出爾反爾", "五體投地", "功敗垂成", "以貌取人"] },
+                        { q: "他因為性格__________，直來直往，有時難免會無意間傷害到別人的感受。", a: "心直口快", options: ["仗勢欺人", "心直口快", "不假思索", "半途而廢"] },
+                        { q: "經過專家的縝密鑑定，這幅古畫的真偽問題終於__________。", a: "水落石出", options: ["水落石出", "以卵擊石", "出爾反爾", "功敗垂成"] },
+                        { q: "憑著個人體力去抵擋猛烈的洪水，簡直是__________。", a: "以卵擊石", options: ["五體投地", "仗勢欺人", "以卵擊石", "半途而廢"] },
+                        { q: "我們不能光看一個人的打扮就下定論，因為__________往往會讓人產生偏見。", a: "以貌取人", options: ["以貌取人", "心直口快", "不假思索", "水落石出"] },
+                        { q: "答應別人的承諾就必須兌現，輕易__________只會失去名譽。", a: "出爾反爾", options: ["半途而廢", "出爾反爾", "功敗垂成", "以卵擊石"] },
+                        { q: "欺負弱小、__________的人，最令人感到不齒。", a: "仗勢欺人", options: ["仗勢欺人", "五體投地", "心直口快", "以貌取人"] },
+                        { q: "克服困難需要毅力，做事切忌__________，否則前面的努力就白費了。", a: "半途而廢", options: ["半途而廢", "不假思索", "水落石出", "功敗垂成"] },
+                        { q: "這座宏偉大橋在即將竣工之際突然遭遇強烈地震而塌陷，簡直是__________。", a: "功敗垂成", options: ["功敗垂成", "以卵擊石", "出爾反爾", "仗勢欺人"] }
+                    ]
+                }
+            },
+            // Set 2: Based on P.25-P.28
+            2: {
+                title: "關卡 二 (P.25 - P.28)",
+                exercises: {
+                    1: [
+                        { q: "一個人應該要有__________，清楚明白自己的優勢與不足，才能不斷進步。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名副其實"] },
+                        { q: "即使這次比賽失利了，你也不可以__________，只要堅持練習，下次一定能取得好成績。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "看著昔日的荒地如今變成繁華的高樓大廈，老村長不禁__________，心中感觸良多。", a: "百感交集", options: ["名列前茅", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "偉明平時讀書非常刻苦，因此每次考試都能在全級__________。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "哥哥因為考試前沉迷打機，結果這次面試不幸__________，讓他後悔不已。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "這家餐廳的廚師技術高超，烹調出來的菜餚美味無比，真是__________。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "出門前帶上一把摺疊傘，__________，萬一下雨也不用擔心。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "青年人應該勤奮好學、勇於擔當，切不可養成__________的壞習慣。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "面對這場突如其來的風災，全體居民__________，攜手重建美好的家園。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "幸好有__________的林伯伯為我們帶路，我們才順利走出這片密林。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    2: [
+                        { q: "光明完全沒有__________，明明自己實力平平，卻總是盲目自大、瞧不起別人。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "在老師和家人耐心的鼓勵下，因傷退出比賽的健康終於不再__________，重新振作起來。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "看到相簿裡自己從小到大的照片與家人的合影，佳琳頓時__________，徹夜難眠。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "姐姐在全港朗誦大賽中表現出色，最終__________，為學校贏得了榮譽。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "雖然他在這次校隊選拔中__________，但他並沒有氣餒，決定加緊自主訓練。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "陽明山風景優美、四季花開，是個__________的避暑勝地。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "颱風來臨前，社區居民紛紛儲備足夠的水和食物，做足__________的準備。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "這個年輕人貪圖享樂、__________，終日無所事事，讓父母十分著急。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "只要大家團結一心、__________，就沒有克服不了的難關。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "遇到複雜的難題時，我們可以請教經驗豐富、__________的老教師。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    3: [
+                        { q: "做人最重要的是有__________，既不自卑，也不狂妄自大。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "失敗並不可怕，可怕的是失敗後便__________，徹底放棄努力。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "站在畢業典禮的舞台上，回想小學六年來的點點滴滴，同學們都__________。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "小麗憑著持之以恆的努力，在這次奧數比賽中__________，勇奪一等獎。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "他因為準備不充分而在公開考試中__________，這給了他一個沉重的教訓。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "張醫生醫術精湛、仁心仁術，是一位__________的好醫生。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "演習前先檢查好所有救生設備，做到__________，才能確保萬無一失。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "如果我們從小養成__________的習氣，長大後將難以在社會上立足。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "在經濟不景氣的環境下，公司全體員工決定__________，共渡時艱。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "導遊先生憑著__________的經驗，帶領我們輕鬆繞過了擁堵的山路。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    4: [
+                        { q: "他缺乏__________，總以為自己無所不能，結果在比賽中頻頻失誤。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "遭遇一次打擊就__________的人，是很難取得最終成功的。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "當看到闊別多年的老朋友重逢相聚時，大家無不__________，流下了感動的淚水。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "子勤勤奮好學，每次大考成績總是__________，深受老師讚賞。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "雖然這次面試__________，但他汲取了教訓，為下一次機會做足準備。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "這本百科全書內容豐富、圖文並茂，真是__________的知識寶庫。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "定期檢查和維修家中的電器設施，__________，能有效防止火災發生。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "這個孩子習慣了衣來伸手、飯來張口，變得十分__________。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "面對全球氣候變化，各國必須打破隔閡、__________，共同保護地球。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "隊長在球場上經驗豐富，宛如__________，總能指引隊員走向勝利。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    5: [
+                        { q: "懂得承認自己的短處，正是有__________的表現。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "人生的道路上總有挫折，我們絕不能遭遇困難就__________。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "老將軍重回昔日浴血奮戰的古戰場，心中__________，久久不能平息。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "在全校陸運會百米賽跑中，陳同學發揮出色，成績__________。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "他因一時大意而在比賽中__________，事後深感遺憾。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "阿里山雲海景色絕美，漫步其中彷彿置身仙境，真可謂__________。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "出遠門前先把車輛全面檢修一遍，__________，開車也更安心。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "爸爸經常教育我們，勞動創造財富，絕不能做一個__________的人。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "在大自然災害面前，人類只有相互扶持、__________，才能重建家園。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "考察隊在沙漠中迷失了方向，全靠那一位__________的老牧民才化險為夷。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    6: [
+                        { q: "一個人若沒有__________，盲目挑戰超乎自己能力的事，往往會招致失敗。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "老師告訴我們，失敗只是成功的過程，萬萬不可因而__________。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "接過榮譽獎盃的那一刻，想起背後付出的無數汗水，他不由得__________。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "經過連續數月的苦讀，她在這次學校選拔試中__________，順利入選。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "雖然他在這次徵文比賽中__________，但他依然堅持每天寫作。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "這位書法家的作品筆力雄健、氣勢磅礡，真是不愧為__________的書法大師。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "隨身攜帶急救包和常用藥品，__________，在戶外活動時十分實用。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "寄生蟲式的生活只會讓人__________、喪失鬥志。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "團隊成員之間只有互相信任、__________，才能順利完成這項宏大的工程。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "這位老警察在偵破懸案方面有著__________的獨到眼光與經驗。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    7: [
+                        { q: "只有具備__________的人，才能正視缺點，不斷完善自己。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "面對一次考試成績不理想，我們應該認真檢討，而不是消極沉淪、__________。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "看著台上學生們出色的表演，指導老師__________，感到無比欣慰。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "他在科學創新比賽中設計的作品構思獨特，評分__________。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "當得知自己在熱門科系篩選中__________時，小強難過得流下了眼淚。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "這座小鎮環境清幽、治安良好，是一個__________的宜居之地。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "家中備好防災應急箱，__________，保障全家人的安全。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "我們要崇尚勞動、熱愛生活，堅決摒棄__________的思想。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "全校師生在籌款活動中__________，為貧窮山區學校籌得了巨額善款。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "遇到了突發緊急狀況，幸好有__________的長輩在場冷靜指揮。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ],
+                    8: [
+                        { q: "他高傲自大，缺乏__________，最終在評選中失去了大家的支持。", a: "自知之明", options: ["自知之明", "自暴自棄", "百感交集", "名列前茅"] },
+                        { q: "無論遭遇多大的打擊，只要不__________，就一定有重新站起來的機會。", a: "自暴自棄", options: ["好逸惡勞", "自暴自棄", "名落孫山", "有備無患"] },
+                        { q: "重新翻開童年時的日記本，回憶起純真的歲月，我不禁__________。", a: "百感交集", options: ["名副其實", "同舟共濟", "百感交集", "老馬識途"] },
+                        { q: "姐姐憑著優異的表現，在全區音樂大賽中__________，榮獲金獎。", a: "名列前茅", options: ["名副其實", "名列前茅", "名落孫山", "自知之明"] },
+                        { q: "雖然他在這次羽毛球錦標賽中__________，但他展現出了良好的體育精神。", a: "名落孫山", options: ["名落孫山", "有備無患", "自暴自棄", "百感交集"] },
+                        { q: "這位企業家熱心公益事業，捐建了多所學校，是一位__________的慈善家。", a: "名副其實", options: ["有備無患", "名副其實", "老馬識途", "自暴自棄"] },
+                        { q: "做任何事之前都要做好備用方案，__________，這樣才能應付各種突發狀況。", a: "有備無患", options: ["有備無患", "同舟共濟", "好逸惡勞", "百感交集"] },
+                        { q: "社會提倡勤勞致富，反對好高騖遠與__________的行為。", a: "好逸惡勞", options: ["好逸惡勞", "名副其實", "自知之明", "老馬識途"] },
+                        { q: "船員們在狂風巨浪中__________，終於將輪船安全駛回港灣。", a: "同舟共濟", options: ["好逸惡勞", "名落孫山", "同舟共濟", "自知之明"] },
+                        { q: "有了__________的老工程師親自帶領，施工團隊進行得非常順利。", a: "老馬識途", options: ["名列前茅", "老馬識途", "名副其實", "自暴自棄"] }
+                    ]
+                }
+            },
+            // Set 3: Based on P.4-P.8
+            3: {
+                title: "關卡 三 (P.4 - P.8)",
+                exercises: {
+                    1: [
+                        { q: "爸爸做事總是__________，不管是處理公務還是檢查功課，都絕不馬虎。", a: "一絲不苟", options: ["一絲不苟", "一波三折", "一鳴驚人", "一竅不通"] },
+                        { q: "這場話劇的排練過程__________，先是主角生病，接着又是道具損壞，幸好最後順利演出。", a: "一波三折", options: ["一髮千鈞", "一波三折", "一視同仁", "人心惶惶"] },
+                        { q: "在大樓倒塌的__________之際，救援人員及時把被困的居民救了出來，化解了危機。", a: "一髮千鈞", options: ["一塌糊塗", "一髮千鈞", "一視同仁", "人心惶惶"] },
+                        { q: "小強平時默默無聞，這次竟然在全港數學比賽中勇奪冠軍，真是令人__________！", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] },
+                        { q: "班主任對待每一位同學都__________，絕不會偏心任何一個人。", a: "一視同仁", options: ["十拿九穩", "一視同仁", "一貧如洗", "九牛一毛"] },
+                        { q: "哥哥為了這次演講比賽訓練了很久，對於奪得優異成績可說是__________。", a: "十拿九穩", options: ["一波三折", "一望無際", "十拿九穩", "一念之差"] },
+                        { q: "表弟對電腦程式設計__________，連最基本的操作都需要別人耐心教導。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "這幾百元的維修費用對大型企業來說只是__________，但對貧困家庭而言卻是一筆不小的負擔。", a: "九牛一毛", options: ["一貧如洗", "九牛一毛", "一塌糊塗", "一髮千鈞"] },
+                        { q: "連日來的暴雨引發山泥傾瀉，住在低窪地區的居民__________，擔心家園被毀。", a: "人心惶惶", options: ["人心惶惶", "一視同仁", "一望無際", "一波三折"] },
+                        { q: "他因為__________，一時貪心偷拿了店裏的物品，結果悔恨莫及。", a: "一念之差", options: ["一念之差", "一塌糊塗", "一鳴驚人", "一絲不苟"] }
+                    ],
+                    2: [
+                        { q: "弟弟今天試着自己做蛋糕，結果把廚房弄得__________。", a: "一塌糊塗", options: ["一絲不苟", "一塌糊塗", "一鳴驚人", "一念之差"] },
+                        { q: "我們站在山頂遠眺，前方的海洋__________，景色十分壯麗。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] },
+                        { q: "一場嚴重的大海嘯過後，許多災民都在一夜之間變得__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一波三折", "一髮千鈞"] },
+                        { q: "建築師對設計圖上的每一個尺寸都要求__________，確保工程結構萬無一失。", a: "一絲不苟", options: ["一波三折", "一絲不苟", "一鳴驚人", "一竅不通"] },
+                        { q: "這部電影的籌備過程__________，經歷了資金短缺和主角換角等重重考驗。", a: "一波三折", options: ["一髮千鈞", "一波三折", "一視同仁", "人心惶惶"] },
+                        { q: "強烈颱風即將逼近，強風吹得窗戶隆隆作響，鬧得附近的居民__________。", a: "人心惶惶", options: ["人心惶惶", "一塌糊塗", "一視同仁", "一望無際"] },
+                        { q: "校長在處理同學之間的紛爭時，始終保持公正，對大家__________。", a: "一視同仁", options: ["十拿九穩", "一視同仁", "一貧如洗", "九牛一毛"] },
+                        { q: "在車禍發生的__________之際，司機及時拉緊手煞車，才避免了慘劇發生。", a: "一髮千鈞", options: ["一塌糊塗", "一髮千鈞", "一念之差", "人心惶惶"] },
+                        { q: "經過幾個月的密集訓練，籃球隊的默契大增，對奪得這次校際盃冠軍感到__________。", a: "十拿九穩", options: ["一波三折", "一望無際", "十拿九穩", "一念之差"] },
+                        { q: "這筆捐款對億萬富豪龐大的財產而言不過是__________，但對貧困山區的小學卻是莫大的幫助。", a: "九牛一毛", options: ["一貧如洗", "九牛一毛", "一塌糊塗", "一鳴驚人"] }
+                    ],
+                    3: [
+                        { q: "他因為__________，做出違反校規的事，受到老師的嚴厲批評。", a: "一念之差", options: ["一念之差", "一塌糊塗", "一鳴驚人", "一絲不苟"] },
+                        { q: "突如其來的暴風雨把花園裏的花草吹得__________，滿地都是落葉。", a: "一塌糊塗", options: ["一絲不苟", "一塌糊塗", "一波三折", "人心惶惶"] },
+                        { q: "經過多年的戰亂與災害，當地的村民大多變得__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一望無際", "一髮千鈞"] },
+                        { q: "這位科學家平時默默無聞，這次發表的新發明卻在國際學術界__________。", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] },
+                        { q: "執法人員在執行職務時，對所有市民都__________，絕不偏袒。", a: "一視同仁", options: ["十拿九穩", "一視同仁", "一貧如洗", "一波三折"] },
+                        { q: "我對下圍棋__________，幸好表哥耐心地從基本規則開始教導我。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "區區幾百元的修車費，對於富豪龐大的財產來說只是__________。", a: "九牛一毛", options: ["一貧如洗", "九牛一毛", "一塌糊塗", "一髮千鈞"] },
+                        { q: "近日社區接連發生連環盜竊案，搞得居民__________，晚上不敢開窗。", a: "人心惶惶", options: ["人心惶惶", "一塌糊塗", "一視同仁", "一望無際"] },
+                        { q: "只要我們平時複習充足，這次考試要取得好成績可說是__________。", a: "十拿九穩", options: ["一波三折", "一望無際", "十拿九穩", "一念之差"] },
+                        { q: "飛機漸漸升高，透過窗戶往外看，下面是__________的綠色草原。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] }
+                    ],
+                    4: [
+                        { q: "陳老師批改作業總是__________，連最微小的錯別字也會指出。", a: "一絲不苟", options: ["一絲不苟", "一波三折", "一鳴驚人", "一竅不通"] },
+                        { q: "我們組的研究報告寫作過程__________，改了三次大綱才最終定稿。", a: "一波三折", options: ["一髮千鈞", "一波三折", "一視同仁", "人心惶惶"] },
+                        { q: "就在火勢即將蔓延到隔壁房屋的__________時刻，消防員成功撲滅了火苗。", a: "一髮千鈞", options: ["一塌糊塗", "一髮千鈞", "一視同仁", "人心惶惶"] },
+                        { q: "這名年輕小將在奧運會上表現出色，__________地摘下了金牌。", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] },
+                        { q: "母親對待家裏的三個孩子一向__________，從不厚此薄彼。", a: "一視同仁", options: ["十拿九穩", "一視同仁", "一貧如洗", "九牛一毛"] },
+                        { q: "小明對廚藝__________，竟然把鹽當作白糖放進了湯裏。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "這場突發的傳染病疫情讓城裏的百姓__________。", a: "人心惶惶", options: ["人心惶惶", "一視同仁", "一望無際", "一波三折"] },
+                        { q: "弟弟玩耍時把客廳弄得__________，媽媽看見後非常生氣。", a: "一塌糊塗", options: ["一絲不苟", "一塌糊塗", "一鳴驚人", "一念之差"] },
+                        { q: "航海家駕駛着帆船，漂泊在__________的大海之上。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] },
+                        { q: "經過這場大火，他的家園付諸一炬，變得__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一波三折", "一髮千鈞"] }
+                    ],
+                    5: [
+                        { q: "只要我們準備充分，這場比賽的勝利想必是__________。", a: "十拿九穩", options: ["十拿九穩", "一波三折", "一望無際", "一念之差"] },
+                        { q: "他當初若不是因為__________，又怎會陷入如今這種尷尬的境地？", a: "一念之差", options: ["一念之差", "一塌糊塗", "一鳴驚人", "一絲不苟"] },
+                        { q: "捐出這區區一百元對他來說不過是__________，根本談不上什麼大犧牲。", a: "九牛一毛", options: ["一貧如洗", "九牛一毛", "一塌糊塗", "一髮千鈞"] },
+                        { q: "工程師在檢測橋樑結構時__________，不放過任何一處細微的裂縫。", a: "一絲不苟", options: ["一絲不苟", "一波三折", "一鳴驚人", "一竅不通"] },
+                        { q: "尋找失蹤熱氣球的搜救行動__________，因惡劣天氣數度中斷。", a: "一波三折", options: ["一髮千鈞", "一波三折", "一視同仁", "人心惶惶"] },
+                        { q: "就在巨石即將滾落砸中行人的__________之際，路人一個箭步上前將他推開。", a: "一髮千鈞", options: ["一塌糊塗", "一髮千鈞", "一視同仁", "人心惶惶"] },
+                        { q: "那位平時成績中等的同學在這次聯考中__________，獲得了全校第一名。", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] },
+                        { q: "裁判員在比賽中必須公平公正，對所有參賽選手__________。", a: "一視同仁", options: ["十拿九穩", "一視同仁", "一貧如洗", "九牛一毛"] },
+                        { q: "他對西洋樂器__________，連小提琴和中提琴都分不清楚。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "謠言在村莊裏迅速流傳開來，搞得大家__________，人心不安。", a: "人心惶惶", options: ["人心惶惶", "一視同仁", "一望無際", "一波三折"] }
+                    ],
+                    6: [
+                        { q: "弟弟不小心把墨水灑在桌上，把整張功課紙弄得__________。", a: "一塌糊塗", options: ["一塌糊塗", "一絲不苟", "一鳴驚人", "一念之差"] },
+                        { q: "站在泰山頂上向下張望，前方的平原__________，令人心曠神怡。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] },
+                        { q: "洪水過後，農田被毀，村裏的幾戶人家頓時變得__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一波三折", "一髮千鈞"] },
+                        { q: "憑着他多年的豐富經驗和精湛技術，這次手術成功的機率是__________的。", a: "十拿九穩", options: ["十拿九穩", "一波三折", "一望無際", "一念之差"] },
+                        { q: "他因為一時衝動和__________，犯下了無法彌補的錯誤。", a: "一念之差", options: ["一念之差", "一塌糊塗", "一鳴驚人", "一絲不苟"] },
+                        { q: "這項大型工程涉及的金額高達數百億，我們捐贈的幾萬元簡直是__________。", a: "九牛一毛", options: ["九牛一毛", "一貧如洗", "一塌糊塗", "一髮千鈞"] },
+                        { q: "秘書整理檔案資料時__________，每一份文件都分類得井井有條。", a: "一絲不苟", options: ["一絲不苟", "一波三折", "一鳴驚人", "一竅不通"] },
+                        { q: "這次合奏表演的準備過程__________，幸好團員們互相支持，最終克服了困難。", a: "一波三折", options: ["一波三折", "一髮千鈞", "一視同仁", "人心惶惶"] },
+                        { q: "在生死存亡的__________關頭，他選擇了將逃生機會留給同伴。", a: "一髮千鈞", options: ["一髮千鈞", "一塌糊塗", "一視同仁", "人心惶惶"] },
+                        { q: "小美在朗誦節比賽中發揮出色，__________奪得冠軍。", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] }
+                    ],
+                    7: [
+                        { q: "公司經理在評核員工表現時，一向__________，按能力論功行賞。", a: "一視同仁", options: ["一視同仁", "十拿九穩", "一貧如洗", "九牛一毛"] },
+                        { q: "我對汽車維修知識__________，車子故障時只能向救援人員求助。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "股市連續幾天大幅下跌，投資者們__________，紛紛拋售股票。", a: "人心惶惶", options: ["人心惶惶", "一視同仁", "一望無際", "一波三折"] },
+                        { q: "壞人把房間搞得__________，試圖尋找隱藏的保險箱。", a: "一塌糊塗", options: ["一塌糊塗", "一絲不苟", "一鳴驚人", "一念之差"] },
+                        { q: "輪船行駛在__________的大西洋上，四周只有浩瀚的水面。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] },
+                        { q: "經歷了連續幾年的旱災，農夫們的家境早已__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一波三折", "一髮千鈞"] },
+                        { q: "有了隊長的加入，我們隊要在這次接力賽中奪冠已經是__________的事情。", a: "十拿九穩", options: ["十拿九穩", "一波三折", "一望無際", "一念之差"] },
+                        { q: "青年人切不可因為一時的利益和__________而走上違法的道路。", a: "一念之差", options: ["一念之差", "一塌糊塗", "一鳴驚人", "一絲不苟"] },
+                        { q: "對於超級大富豪來說，買下一輛名貴跑車所花的錢不過是__________。", a: "九牛一毛", options: ["九牛一毛", "一貧如洗", "一塌糊塗", "一髮千鈞"] },
+                        { q: "醫生在做手術時必須__________，稍有疏忽就可能危及病人生命。", a: "一絲不苟", options: ["一絲不苟", "一波三折", "一鳴驚人", "一竅不通"] }
+                    ],
+                    8: [
+                        { q: "這項外交談判經歷了__________，談判雙方終於簽署了和平協議。", a: "一波三折", options: ["一波三折", "一髮千鈞", "一視同仁", "人心惶惶"] },
+                        { q: "就在懸崖邊上的石頭鬆動的__________時刻，救援人員一把拉住了登山客。", a: "一髮千鈞", options: ["一髮千鈞", "一塌糊塗", "一視同仁", "人心惶惶"] },
+                        { q: "那位年輕畫家在國際藝術展覽上憑着一幅巨作__________，震驚了畫壇。", a: "一鳴驚人", options: ["一鳴驚人", "一竅不通", "九牛一毛", "十拿九穩"] },
+                        { q: "社會福利機構應該對所有求助者__________，提供平等的關心。", a: "一視同仁", options: ["一視同仁", "十拿九穩", "一貧如洗", "九牛一毛"] },
+                        { q: "他對古典詩詞__________，連「床前明月光」是誰寫的都答不出來。", a: "一竅不通", options: ["一竅不通", "一鳴驚人", "一絲不苟", "人心惶惶"] },
+                        { q: "當地發生地震後，各種謠言四起，搞得市民__________。", a: "人心惶惶", options: ["人心惶惶", "一視同仁", "一望無際", "一波三折"] },
+                        { q: "弟弟把文具和玩具散落得滿地都是，把臥室用得__________。", a: "一塌糊塗", options: ["一塌糊塗", "一絲不苟", "一鳴驚人", "一念之差"] },
+                        { q: "飛機飛越沙漠上空，下面是一片金色而又__________的沙丘。", a: "一望無際", options: ["一望無際", "一視同仁", "九牛一毛", "一竅不通"] },
+                        { q: "戰爭給人民帶來了深重的災難，無數家庭變得__________。", a: "一貧如洗", options: ["一貧如洗", "十拿九穩", "一波三折", "一髮千鈞"] },
+                        { q: "只要大家發揮團隊合作精神，順利完成這次任務是__________的。", a: "十拿九穩", options: ["十拿九穩", "一波三折", "一望無際", "一念之差"] }
+                    ]
+                }
+            },
+            // Set 4: Based on P.9-P.12
+            4: {
+                title: "關卡 四 (P.9 - P.12)",
+                exercises: {
+                    1: [
+                        { q: "只要大家團結一致、共同努力，相信__________，我們一定能戰勝這次自然災害。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "做人應該言行一致，千萬不要做一個表面討好、背地裏卻__________的人。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "在這次校慶烹飪大賽中，媽媽終於可以__________，展現她精湛的廚藝。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "弟弟不小心打碎了爸爸珍藏的古董茶壺，惹得爸爸__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "這張手繪卡片雖然並不昂貴，但代表著朋友遠方深深的祝福，真是__________。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "面對突如其來的舞台燈光故障，第一次擔任主持人的他一時慌得__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "每當我在學習上遇到難題，林老師總會__________地為我反覆解答。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "這名殘疾運動員憑著__________的精神，克服重重困難，終於奪得金牌。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這套衣服搭配得風格怪異，看起來__________，十分奇怪。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "清潔工人每天早出晚歸，__________地維護城市環境的整潔。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    2: [
+                        { q: "古人常說「__________」，只要我們不斷改進技術，就能克服大自然的限制。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "他這個人總是嘴裏說支持，心裏卻反對，如此__________，實在難以讓人信任。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "全港青少年武術比賽即將舉行，哥哥準備在賽場上__________。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "小明因為連續幾天沒有交功課，老師對他__________並嚴厲訓斥。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "表哥從外地寄來當地的小紀念品，雖然價值不高，但充滿濃濃情誼，正如「__________」。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "走失的小女孩在街頭流淚，感到十分不安和__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "媽媽總是__________地提醒我睡前要收拾好書包，以免漏帶課本。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "消防員們抱著__________的意志，在烈火中奮勇救人。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這篇文章把現代流行語與古代文言文混雜在一起，顯得__________。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "醫護人員在疫情期間__________地照顧病人，獲得市民的廣泛讚賞。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    3: [
+                        { q: "面對嚴峻的旱災，農民們透過興修水利改善灌溉，展現了__________的決心。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "誠實是待人接物的基本原則，我們決不能對朋友__________。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "魔術師在舞台上__________，變出了各種令人驚嘆的道具。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "看見好端端的沙發被小狗咬破了，媽媽忍不住__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "遠方的筆友寄來一枚自製書籤，這份情意可說是「__________，禮輕情意重」。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "電腦突然藍屏熄機，未保存的文件全部丟失，讓他頓時感到__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "導遊先生__________地向遊客介紹歷史古蹟的背景，非常專業。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "歷經多次失敗後，科研團隊憑著__________的毅力，終於成功研發新藥。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這座建築物強行融合了中西兩種截然不同的風格，看起來有些__________。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "父母多年來__________地養育我們成長，我們長大後一定要好好孝順他們。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    4: [
+                        { q: "儘管環境險惡，但只要人類勇敢面對、善用智慧，終能實現__________。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "社交場合中，有些人習慣__________、逢迎拍馬，我們應保持清醒。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "校際派對上，擅長演奏小提琴的子晴在台上__________，獲得陣陣掌聲。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "顧客發現餐點中有異物後向店員理論，經理了解情況後向責任員工__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "奶奶把遠方親戚寄來的特產視若珍寶，常對我們說這是__________。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "突然聽到警報器大作，走廊上的學生們一時緊張得__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "字典是學習的好幫手，它總是__________地解答我們對字詞的疑問。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "革命先烈為了國家的光明未來，進行了__________的鬥爭。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這首流行歌曲強行加入了京劇腔調，聽起來有些__________。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "郵差叔叔無論颳風下雨都__________地把信件送到每一戶人家。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    5: [
+                        { q: "防洪工程的竣工證明了人類戰勝自然災害的可能，真是「__________」。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "我們要聽其言而觀其行，切勿被那些__________的人所矇騙。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "學校舉辦社團展覽，機器人學會的同學在現場__________，示範操控機器人。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "弟弟把姐姐辛苦做好的美勞作品弄壞了，姐姐氣得__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "雖然這只是一羽微薄的紀念品，但包含著遠方親友的深情厚誼，可謂__________。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "首次參加獨奏比賽的他在登台那一刻緊張萬分，顯得有些__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "爺爺每次見到我，總是__________地囑咐我要注意身體健康。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "海倫·凱勒雖然失明失聰，但她以__________的精神成為了偉大的作家。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這幅畫畫得既不像馬也不像鹿，簡直是__________。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "志工們__________地為社區長者送飯和清洗房屋，令人感動。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    6: [
+                        { q: "人類克服重重險阻成功登月，再次向世界證明了__________的真理。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "一個隨意承諾卻從不兌現的人，往往給人留下__________的印象。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "園藝師在花展上__________，將原本平淡的花草修剪成栩栩如生的動物造型。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "看到剛清理好的客廳又被孩子弄得亂七八糟，媽媽頓時__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "遠方朋友寄來的這張生日賀卡，雖然簡單，但真可謂「__________」。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "在人山人海的商場裏與家人走散後，小弟弟急得__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "教練在訓練場上一遍又一遍、__________地糾正球員們的動作。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "探險家們憑著__________的意志，穿過了茫茫的沙漠。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這種把古裝劇台詞配上現代俚語的演出，給人一種__________的感覺。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "考古學家__________地在發掘現場清理文物，終於發現了古代遺跡。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    7: [
+                        { q: "天災固然可怕，但只要眾志成城，我們就堅信__________。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "說話心口不一、__________，是損害人際信任的罪魁禍首。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "校運會的百米賽跑項目中，衛冕冠軍在跑道上__________，順利破紀錄。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "看到兒子沉迷電子遊戲而耽誤學業，父親忍不住__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "這枚手工製作的書籤代表著異地好友的心意，真可謂__________。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "遇到突發緊急狀況時，我們應保持鎮定，切不可慌張和__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "圖書管理員總是__________地指引讀者尋找所需的參考書籍。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "革命家們在嚴酷的環境下堅持信念，進行了__________的奮鬥。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這間餐廳將中餐與西餐隨意混搭，菜色顯得__________，顧客反應平平。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "老師夜以繼日、__________地批改作業，默默為學生付出。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ],
+                    8: [
+                        { q: "荒漠變綠洲的奇蹟，充分展示了勞動人民靠雙手創造的__________。", a: "人定勝天", options: ["人定勝天", "口是心非", "大顯身手", "大發雷霆"] },
+                        { q: "真正值得交往的朋友會直言相告，絕不會對你__________。", a: "口是心非", options: ["不知所措", "口是心非", "不厭其煩", "不屈不撓"] },
+                        { q: "著名書法家受邀來到學校，在大禮堂現場揮毫，__________。", a: "大顯身手", options: ["大發雷霆", "大顯身手", "千里鵝毛", "不倫不類"] },
+                        { q: "校長得知少數同學欺凌弱小的行為後怒不可遏，在大會上__________。", a: "大發雷霆", options: ["不辭勞苦", "大發雷霆", "人定勝天", "不知所措"] },
+                        { q: "遠方親友寄來的一盒普通土特產，承載著滿滿關懷，可謂「__________」。", a: "千里鵝毛", options: ["千里鵝毛", "口是心非", "不倫不類", "大顯身手"] },
+                        { q: "第一次獨自搭乘地鐵的他在錯過下車車站後，一時間發愣和__________。", a: "不知所措", options: ["不屈不撓", "不厭其煩", "不知所措", "大發雷霆"] },
+                        { q: "媽媽耐心地、__________地一遍遍教妹妹綁鞋帶。", a: "不厭其煩", options: ["不厭其煩", "不辭勞苦", "口是心非", "人定勝天"] },
+                        { q: "患病的愛迪生經歷了數千次失敗，仍以__________的精神堅持實驗，最終發明了電燈。", a: "不屈不撓", options: ["不倫不類", "不屈不撓", "千里鵝毛", "大顯身手"] },
+                        { q: "這篇作文結構混亂，語言夾雜不當，寫得__________。", a: "不倫不類", options: ["不倫不類", "千里鵝毛", "大顯身手", "口是心非"] },
+                        { q: "建築工人冒著酷暑，__________地辛勤工作，為城市建起一座座高樓。", a: "不辭勞苦", options: ["不辭勞苦", "不厭其煩", "不知所措", "大發雷霆"] }
+                    ]
+                }
+            }
+        };
+
+        const BIRD_SHOP_DATA = {
+            'bird-yellow': { name: '黃鳥', price: { coins: 150, gems: 5, pearls: 0, leaves: 10 } },
+            'bird-blue': { name: '藍鳥', price: { coins: 150, gems: 5, pearls: 0, leaves: 10 } },
+            'bird-black': { name: '炸彈黑鳥', price: { coins: 300, gems: 15, pearls: 1, leaves: 25 } },
+            'bird-white': { name: '白鳥', price: { coins: 300, gems: 15, pearls: 1, leaves: 25 } },
+            'bird-green': { name: '綠迴旋鳥', price: { coins: 350, gems: 20, pearls: 2, leaves: 30 } },
+            'bird-pink': { name: '粉紅鳥', price: { coins: 400, gems: 25, pearls: 3, leaves: 40 } },
+            'bird-orange': { name: '橘鳥', price: { coins: 300, gems: 15, pearls: 1, leaves: 25 } },
+            'bird-silver': { name: '銀鳥', price: { coins: 600, gems: 40, pearls: 5, leaves: 60 } },
+            'bird-bigred': { name: '大紅鳥', price: { coins: 800, gems: 50, pearls: 8, leaves: 80 } },
+            'bird-eagle': { name: '神鷹', price: { coins: 1000, gems: 100, pearls: 20, leaves: 100 } },
+            'bird-ice': { name: '冰鳥', price: { coins: 450, gems: 30, pearls: 4, leaves: 45 } },
+            'bird-melody': { name: '美樂蒂', price: { coins: 500, gems: 35, pearls: 5, leaves: 50 } },
+            'bird-tony': { name: '托尼', price: { coins: 850, gems: 60, pearls: 10, leaves: 85 } },
+            'bird-ruby': { name: '露比', price: { coins: 350, gems: 20, pearls: 2, leaves: 30 } },
+            'bird-leonard': { name: '雷納德 (豬王)', price: { coins: 900, gems: 75, pearls: 15, leaves: 90 } },
+            'bird-shade': { name: '暗影鳥 (Shade)', price: { coins: 750, gems: 45, pearls: 8, leaves: 75 } },
+            'bird-bounci': { name: '彈彈鳥 (Bounci)', price: { coins: 500, gems: 35, pearls: 5, leaves: 50 } },
+            'bird-gale': { name: '蓋爾 (Gale)', price: { coins: 700, gems: 40, pearls: 6, leaves: 65 } },
+            'bird-shakira': { name: '夏奇拉鳥 (Shakira)', price: { coins: 650, gems: 35, pearls: 5, leaves: 60 } },
+            'bird-jo': { name: '阿喬 (Jo)', price: { coins: 550, gems: 30, pearls: 4, leaves: 50 } },
+            'bird-gordon': { name: '戈登 (Gordon)', price: { coins: 400, gems: 20, pearls: 2, leaves: 35 } },
+            'bird-ollie': { name: '奧利 (Ollie)', price: { coins: 450, gems: 25, pearls: 3, leaves: 40 } },
+            'bird-bombom': { name: '蹦蹦 (Bombom)', price: { coins: 500, gems: 30, pearls: 4, leaves: 45 } },
+            'bird-rusty': { name: '羅斯蒂 (Rusty)', price: { coins: 550, gems: 35, pearls: 5, leaves: 50 } },
+            'chick-red': { name: '小紅雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-orange': { name: '小橘雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-yellow': { name: '小黃雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-lightgreen': { name: '淺綠小雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-green': { name: '小綠雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-lightblue': { name: '淺藍小雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-blue': { name: '小藍雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-purple': { name: '小紫雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-pink': { name: '小粉雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-darkpink': { name: '深粉小雞', price: { coins: 50, gems: 0, pearls: 0, leaves: 5 } },
+            'chick-black': { name: '小黑雞', price: { coins: 150, gems: 5, pearls: 0, leaves: 15 } },
+            'chick-white': { name: '小白雞', price: { coins: 150, gems: 5, pearls: 0, leaves: 15 } },
+            'chick-grey': { name: '小灰雞', price: { coins: 150, gems: 5, pearls: 0, leaves: 15 } },
+            'chick-brown': { name: '小棕雞', price: { coins: 150, gems: 5, pearls: 0, leaves: 15 } },
+            'chick-ochre': { name: '赭色小雞', price: { coins: 150, gems: 5, pearls: 0, leaves: 15 } }
+        };
+
+        const HATS_DATA = [
+            { id: 'cat', name: '貓咪帽', price: { coins: 300, gems: 10, pearls: 2, leaves: 20 }, colorClass: 'bg-yellow-100 border-yellow-400', textClass: 'text-pink-700', btnClass: 'bg-pink-500 hover:bg-pink-400 border-pink-700' },
+            { id: 'dog', name: '狗狗帽', price: { coins: 400, gems: 15, pearls: 3, leaves: 25 }, colorClass: 'bg-orange-100 border-orange-400', textClass: 'text-orange-800', btnClass: 'bg-orange-500 hover:bg-orange-400 border-orange-700' },
+            { id: 'transformer', name: '機甲頭盔', price: { coins: 800, gems: 30, pearls: 5, leaves: 50 }, colorClass: 'bg-blue-100 border-blue-400', textClass: 'text-blue-800', btnClass: 'bg-blue-600 hover:bg-blue-500 border-blue-800' },
+            { id: 'shades', name: '酷炫墨鏡', price: { coins: 350, gems: 12, pearls: 2, leaves: 22 }, colorClass: 'bg-gray-200 border-gray-500', textClass: 'text-gray-900', btnClass: 'bg-gray-800 hover:bg-gray-700 border-black' }
+        ];
+
+        function getHatUseTag() {
+            if (state.equippedHat === 'none') return '';
+            return `<use href="#hat-${state.equippedHat}"></use>`;
+        }
+
+        function updateGlobalHats() {
+            const homeBirdIds = ['home-bird-1', 'home-bird-2', 'home-bird-3'];
+            const birds = ['bird-red', 'bird-yellow', 'bird-black'];
+            homeBirdIds.forEach((id, idx) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = `<use href="#${birds[idx]}"></use>${getHatUseTag()}`;
+                }
+            });
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('shop-grid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            
+            BIRD_TYPES.forEach(birdId => {
+                if(birdId === 'bird-red') return; // Default bird is already owned
+                
+                const isUnlocked = state.unlockedBirds.includes(birdId);
+                const data = BIRD_SHOP_DATA[birdId];
+                if(!data) return;
+
+                const price = data.price;
+                const canBuy = state.coins >= price.coins && state.gems >= price.gems && state.pearls >= price.pearls && state.leaves >= price.leaves;
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `wood-panel rounded-xl flex flex-col items-center justify-between p-3 relative`;
+                
+                let btnHTML = '';
+                if (isUnlocked) {
+                    btnHTML = `<button class="w-full mt-3 py-2 bg-gray-400 text-white rounded font-bold cursor-not-allowed border-b-4 border-gray-500 text-sm" disabled>已擁有</button>`;
+                } else {
+                    btnHTML = `<button class="w-full mt-3 py-2 text-white rounded font-bold border-b-4 transition-transform active:translate-y-1 active:border-b-0 text-sm ${canBuy ? 'bg-green-500 hover:bg-green-400 border-green-700 cursor-pointer' : 'bg-gray-400 border-gray-500 cursor-not-allowed'}" onclick="buyBird('${birdId}', event)" ${canBuy ? '' : 'disabled'}>購買</button>`;
+                }
+
+                itemDiv.innerHTML = `
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mb-2">
+                        <svg viewBox="0 0 100 100" class="w-full h-full"><use href="#${birdId}"></use></svg>
+                    </div>
+                    <h4 class="font-bold text-gray-800 text-center text-sm">${data.name}</h4>
+                    ${!isUnlocked ? renderPrice(price) : '<div class="text-green-700 font-bold mt-2 h-10 flex items-center text-sm">✓ 解鎖完成</div>'}
+                    ${btnHTML}
+                `;
+                grid.appendChild(itemDiv);
+            });
+
+            // Add Hats to shop
+            HATS_DATA.forEach(hat => {
+                const isUnlocked = state[`${hat.id}HatUnlocked`];
+                const price = hat.price;
+                const canBuy = state.coins >= price.coins && state.gems >= price.gems && state.pearls >= price.pearls && state.leaves >= price.leaves;
+                
+                const hatDiv = document.createElement('div');
+                hatDiv.className = `wood-panel rounded-xl flex flex-col items-center justify-between p-3 relative ${hat.colorClass}`;
+                
+                let hatBtnHTML = '';
+                if (isUnlocked) {
+                    hatBtnHTML = `<button class="w-full mt-3 py-2 bg-gray-400 text-white rounded font-bold cursor-not-allowed border-b-4 border-gray-500 text-sm" disabled>已擁有</button>`;
+                } else {
+                    hatBtnHTML = `<button class="w-full mt-3 py-2 text-white rounded font-bold border-b-4 transition-transform active:translate-y-1 active:border-b-0 text-sm ${canBuy ? hat.btnClass + ' cursor-pointer' : 'bg-gray-400 border-gray-500 cursor-not-allowed'}" onclick="buyHat('${hat.id}', event)" ${canBuy ? '' : 'disabled'}>購買</button>`;
+                }
+                
+                hatDiv.innerHTML = `
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 mb-2 relative" id="shop-hat-${hat.id}">
+                        <svg viewBox="0 0 100 100" class="w-full h-full absolute opacity-40"><use href="#bird-red"></use></svg>
+                        <svg viewBox="0 0 100 100" class="w-full h-full absolute z-10"><use href="#hat-${hat.id}"></use></svg>
+                    </div>
+                    <h4 class="font-bold ${hat.textClass} text-center text-sm">${hat.name} (配件)</h4>
+                    ${!isUnlocked ? renderPrice(price) : '<div class="text-green-700 font-bold mt-2 h-10 flex items-center text-sm">✓ 解鎖完成</div>'}
+                    ${hatBtnHTML}
+                `;
+                grid.appendChild(hatDiv);
+            });
+        }
+
+        function buyHat(hatId, event) {
+            const hat = HATS_DATA.find(h => h.id === hatId);
+            if (!hat) return;
+            const price = hat.price;
+            if (state.coins >= price.coins && state.gems >= price.gems && state.pearls >= price.pearls && state.leaves >= price.leaves) {
+                state.coins -= price.coins;
+                state.gems -= price.gems;
+                state.pearls -= price.pearls;
+                state.leaves -= price.leaves;
+                
+                state[`${hatId}HatUnlocked`] = true;
+                state.equippedHat = hatId;
+                
+                localStorage.setItem(`idiom${hatId.charAt(0).toUpperCase() + hatId.slice(1)}Hat`, 'true');
+                localStorage.setItem('idiomEquippedHat', hatId);
+                
+                updateHUD();
+                renderShop();
+                populateCollection();
+                updateGlobalHats();
+                
+                if(event && event.target) {
+                    createParticles(event.target.getBoundingClientRect());
+                }
+            }
+        }
+
+        function renderPrice(price) {
+            let html = '<div class="flex flex-wrap justify-center gap-x-2 gap-y-1 mt-2 h-10 items-center">';
+            if(price.coins > 0) html += `<div class="flex items-center gap-1 text-xs font-bold text-yellow-900"><svg class="w-3 h-3 sm:w-4 sm:h-4"><use href="#icon-coin"></use></svg>${price.coins}</div>`;
+            if(price.gems > 0) html += `<div class="flex items-center gap-1 text-xs font-bold text-cyan-900"><svg class="w-3 h-3 sm:w-4 sm:h-4"><use href="#icon-gem"></use></svg>${price.gems}</div>`;
+            if(price.pearls > 0) html += `<div class="flex items-center gap-1 text-xs font-bold text-pink-900"><svg class="w-3 h-3 sm:w-4 sm:h-4"><use href="#icon-pearl"></use></svg>${price.pearls}</div>`;
+            if(price.leaves > 0) html += `<div class="flex items-center gap-1 text-xs font-bold text-green-900"><svg class="w-3 h-3 sm:w-4 sm:h-4"><use href="#icon-leaf"></use></svg>${price.leaves}</div>`;
+            html += '</div>';
+            return html;
+        }
+
+        function buyBird(birdId, event) {
+            const data = BIRD_SHOP_DATA[birdId];
+            if(!data) return;
+            const price = data.price;
+            
+            if (state.coins >= price.coins && state.gems >= price.gems && state.pearls >= price.pearls && state.leaves >= price.leaves) {
+                // Deduct currencies
+                state.coins -= price.coins;
+                state.gems -= price.gems;
+                state.pearls -= price.pearls;
+                state.leaves -= price.leaves;
+                
+                // Unlock bird
+                state.unlockedBirds.push(birdId);
+                
+                // Update UI immediately
+                updateHUD();
+                populateCollection();
+                renderShop();
+                
+                // Particle celebration effect
+                if(event && event.target) {
+                    const rect = event.target.getBoundingClientRect();
+                    createParticles(rect);
+                }
+            }
+        }
+
+        function init() {
+            updateHUD();
+            populateCollection();
+            renderShop();
+            updateGlobalHats();
+            
+            // Restore session UI after hot-reloads
+            if (state.currentScreen === 'game' && state.questions && state.questions.length > 0) {
+                showScreen('game');
+                loadQuestion();
+            } else if (state.currentScreen === 'exercise-select' || state.currentScreen === 'result') {
+                if (state.currentSet) {
+                    startSet(state.currentSet);
+                } else {
+                    showScreen('home');
+                }
+            } else {
+                showScreen(state.currentScreen || 'home');
+            }
+        }
+
+        function updateHUD() {
+            const coinEl = document.getElementById('coin-display');
+            const gemEl = document.getElementById('gem-display');
+            const pearlEl = document.getElementById('pearl-display');
+            const leafEl = document.getElementById('leaf-display');
+            
+            if(coinEl.innerText !== state.coins.toString()) {
+                coinEl.innerText = state.coins;
+                coinEl.parentElement.classList.add('coin-anim');
+                setTimeout(() => coinEl.parentElement.classList.remove('coin-anim'), 500);
+            }
+            
+            if(gemEl.innerText !== state.gems.toString()) {
+                gemEl.innerText = state.gems;
+                gemEl.parentElement.classList.add('coin-anim');
+                setTimeout(() => gemEl.parentElement.classList.remove('coin-anim'), 500);
+            }
+
+            if(pearlEl.innerText !== state.pearls.toString()) {
+                pearlEl.innerText = state.pearls;
+                pearlEl.parentElement.classList.add('coin-anim');
+                setTimeout(() => pearlEl.parentElement.classList.remove('coin-anim'), 500);
+            }
+
+            if(leafEl.innerText !== state.leaves.toString()) {
+                leafEl.innerText = state.leaves;
+                leafEl.parentElement.classList.add('coin-anim');
+                setTimeout(() => leafEl.parentElement.classList.remove('coin-anim'), 500);
+            }
+
+            localStorage.setItem('idiomCoins', state.coins);
+            localStorage.setItem('idiomGems', state.gems);
+            localStorage.setItem('idiomPearls', state.pearls);
+            localStorage.setItem('idiomLeaves', state.leaves);
+            localStorage.setItem('idiomBirds', JSON.stringify(state.unlockedBirds));
+            
+            if (typeof saveData === 'function') saveData();
+        }
+
+        function showScreen(screenName) {
+            ['home', 'collection', 'game', 'exercise-select', 'result', 'shop'].forEach(s => {
+                const el = document.getElementById(`screen-${s}`);
+                if(el) el.classList.add('hidden');
+            });
+            document.getElementById(`screen-${screenName}`).classList.remove('hidden');
+            
+            const btnBack = document.getElementById('btn-back');
+            const hudSpacer = document.getElementById('hud-spacer');
+            
+            if (screenName === 'home') {
+                btnBack.classList.add('hidden');
+                hudSpacer.classList.remove('hidden');
+                btnBack.onclick = () => showScreen('home'); // Reset back action
+            } else {
+                btnBack.classList.remove('hidden');
+                hudSpacer.classList.add('hidden');
+                
+                // Specific back actions depending on current screen
+                if (screenName === 'exercise-select') {
+                    btnBack.onclick = () => showScreen('home');
+                } else if (screenName === 'game') {
+                    btnBack.onclick = () => showScreen('exercise-select');
+                } else if (screenName === 'collection' || screenName === 'shop') {
+                    btnBack.onclick = () => showScreen('home');
+                } else if (screenName === 'result') {
+                    btnBack.onclick = () => showScreen('exercise-select');
+                }
+            }
+            
+            if (screenName === 'shop') renderShop();
+            
+            state.currentScreen = screenName;
+            saveSession();
+            window.scrollTo(0, 0); // Reset scroll position for screens like result
+        }
+
+        function populateCollection() {
+            const grid = document.getElementById('collection-grid');
+            grid.innerHTML = '';
+            
+            const unlockedHatsCount = ['cat', 'dog', 'transformer', 'shades'].filter(id => state[`${id}HatUnlocked`]).length;
+
+            if (unlockedHatsCount > 0) {
+                const toggleDiv = document.createElement('div');
+                toggleDiv.className = 'col-span-full flex flex-col items-center mb-6 wood-panel p-4 rounded-xl';
+                
+                let buttonsHTML = `<div class="flex flex-wrap justify-center gap-3 w-full">`;
+                
+                // No hat button
+                buttonsHTML += `<button class="btn-game rounded-full py-2 px-6 text-white font-bold flex flex-col items-center gap-1 transition-transform active:translate-y-1 ${state.equippedHat === 'none' ? 'ring-4 ring-yellow-400 scale-105' : 'opacity-70'}" onclick="equipHat('none')" style="background: linear-gradient(to bottom, #9ca3af, #4b5563)">
+                    <span class="text-lg angry-font">無帽子</span>
+                </button>`;
+
+                HATS_DATA.forEach(hat => {
+                    if (state[`${hat.id}HatUnlocked`]) {
+                        buttonsHTML += `<button class="btn-game rounded-full py-2 px-6 text-white font-bold flex flex-col items-center gap-1 transition-transform active:translate-y-1 ${state.equippedHat === hat.id ? 'ring-4 ring-yellow-400 scale-105' : 'opacity-70'}" onclick="equipHat('${hat.id}')" style="background: linear-gradient(to bottom, #22c55e, #16a34a)">
+                            <svg viewBox="0 0 100 100" class="w-8 h-8 drop-shadow-md"><use href="#hat-${hat.id}"></use></svg>
+                            <span class="text-lg angry-font">${hat.name}</span>
+                        </button>`;
+                    }
+                });
+                
+                buttonsHTML += `</div>`;
+                
+                toggleDiv.innerHTML = `
+                    <h4 class="angry-font text-yellow-900 text-xl mb-3">更換裝備</h4>
+                    ${buttonsHTML}
+                `;
+                grid.appendChild(toggleDiv);
+            }
+
+            BIRD_TYPES.forEach(birdId => {
+                const isUnlocked = state.unlockedBirds.includes(birdId);
+                const birdDiv = document.createElement('div');
+                birdDiv.className = `wood-panel rounded-xl aspect-square flex flex-col items-center justify-center p-2 relative overflow-hidden ${isUnlocked ? '' : 'grayscale opacity-50'}`;
+                
+                if (!isUnlocked) {
+                    birdDiv.innerHTML = `<div class="absolute inset-0 flex items-center justify-center text-5xl text-gray-800 font-bold opacity-30 z-30">?</div>`;
+                }
+
+                let hatSVG = '';
+                if (isUnlocked && state.equippedHat !== 'none') {
+                    hatSVG = `<svg viewBox="0 0 100 100" class="w-full h-full absolute top-2 left-0 z-20 pointer-events-none drop-shadow-md"><use href="#hat-${state.equippedHat}"></use></svg>`;
+                }
+
+                birdDiv.innerHTML += `<svg viewBox="0 0 100 100" class="w-full h-full z-10"><use href="#${birdId}"></use></svg>${hatSVG}`;
+                grid.appendChild(birdDiv);
+            });
+        }
+
+        function equipHat(hatId) {
+            state.equippedHat = hatId;
+            localStorage.setItem('idiomEquippedHat', hatId);
+            populateCollection();
+            updateGlobalHats();
+            if (typeof saveData === 'function') saveData();
+        }
+
+        function unlockRandomBird() {
+            const lockedBirds = BIRD_TYPES.filter(b => !state.unlockedBirds.includes(b));
+            if (lockedBirds.length > 0) {
+                const newBird = lockedBirds[Math.floor(Math.random() * lockedBirds.length)];
+                state.unlockedBirds.push(newBird);
+                populateCollection();
+                if (typeof saveData === 'function') saveData();
+                return newBird;
+            }
+            return null;
+        }
+
+        function getRandomUnlockedBird() {
+            return state.unlockedBirds[Math.floor(Math.random() * state.unlockedBirds.length)];
+        }
+
+        function startSet(setNum) {
+            state.currentSet = setNum;
+            
+            const setData = exerciseData[setNum];
+            document.getElementById('exercise-set-title').innerText = setData.title;
+            
+            const idiomListContainer = document.getElementById('exercise-idiom-list');
+            idiomListContainer.innerHTML = '';
+            if (setIdioms[setNum]) {
+                setIdioms[setNum].forEach(idiom => {
+                    const span = document.createElement('span');
+                    span.className = "bg-white px-2 py-1 rounded border border-gray-300 text-sm";
+                    span.innerText = idiom;
+                    idiomListContainer.appendChild(span);
+                });
+            }
+
+            const grid = document.getElementById('exercise-grid');
+            grid.innerHTML = '';
+            
+            saveSession();
+            
+            // Populate the 8 exercises for the selected set
+            for (let i = 1; i <= 8; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'btn-game wood-panel rounded-2xl p-4 flex flex-col items-center justify-center gap-2 h-24';
+                btn.onclick = () => startExercise(i);
+                
+                btn.innerHTML = `
+                    <span class="angry-font text-white text-xl">練習 ${['一','二','三','四','五','六','七','八'][i-1]}</span>
+                    <span class="text-white text-xs font-bold">${setData.exercises[i].length} 題</span>
+                `;
+                grid.appendChild(btn);
+            }
+            
+            showScreen('exercise-select');
+        }
+
+        function startExercise(exerciseNum) {
+            state.currentExercise = exerciseNum;
+            state.questions = [...exerciseData[state.currentSet].exercises[exerciseNum]];
+            
+            // Store original total length before potential shuffling or modification
+            state.totalQuestions = state.questions.length;
+            
+            // Shuffle questions for varied gameplay
+            state.questions.sort(() => Math.random() - 0.5);
+            state.currentQuestionIndex = 0;
+            state.score = 0;
+            state.streak = 0;
+            state.userAnswers = []; // Reset user answers for the new round
+            
+            saveSession();
+            
+            document.getElementById('feedback-overlay').classList.add('hidden');
+            
+            showScreen('game');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const qData = state.questions[state.currentQuestionIndex];
+            
+            // Update Progress using actual total questions in the exercise
+            const total = state.totalQuestions;
+            const progressPct = (state.currentQuestionIndex / total) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPct}%`;
+            document.getElementById('progress-text').innerText = `${state.currentQuestionIndex + 1} / ${total}`;
+
+            // Setup Battlefield
+            const birdId = getRandomUnlockedBird();
+            const birdSvg = document.getElementById('current-bird-svg');
+            birdSvg.innerHTML = `<use href="#${birdId}"></use>`;
+            
+            if (state.equippedHat !== 'none') {
+                birdSvg.innerHTML += `<use href="#hat-${state.equippedHat}"></use>`;
+            }
+            
+            // Reset animations
+            birdSvg.classList.remove('bird-fly-in');
+            void birdSvg.offsetWidth; // trigger reflow
+            birdSvg.classList.add('bird-fly-in');
+            
+            const enemy = document.getElementById('enemy-container');
+            enemy.style.transform = 'translateY(0) rotate(0deg) scale(1)';
+            enemy.style.opacity = '1';
+
+            // Setup Question
+            document.getElementById('question-text').innerHTML = qData.q.replace('__________', '<span class="inline-block w-24 border-b-2 border-gray-800"></span>');
+
+            // Setup Options
+            const optsContainer = document.getElementById('options-container');
+            optsContainer.innerHTML = '';
+            
+            // Shuffle options
+            const options = [...qData.options].sort(() => Math.random() - 0.5);
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option rounded-xl py-4 px-2 angry-font text-lg md:text-xl w-full';
+                btn.innerText = opt;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOpt, btnEl) {
+            const opts = document.getElementById('options-container').querySelectorAll('button');
+            opts.forEach(b => b.disabled = true); // Disable all buttons
+            
+            const qData = state.questions[state.currentQuestionIndex];
+            const isCorrect = selectedOpt === qData.a;
+            
+            // Record answer for review
+            state.userAnswers.push({
+                question: qData.q,
+                selected: selectedOpt,
+                correct: qData.a,
+                isCorrect: isCorrect
+            });
+            
+            saveSession();
+            
+            btnEl.classList.add(isCorrect ? 'correct' : 'wrong');
+            
+            const enemy = document.getElementById('enemy-container');
+            const birdSvg = document.getElementById('current-bird-svg');
+            
+            if (isCorrect) {
+                state.score++;
+                state.streak++;
+                
+                // Bird Attack Animation
+                birdSvg.style.transition = 'transform 0.4s cubic-bezier(0.5, 0, 1, 1)';
+                birdSvg.style.transform = `translate(calc(100vw - 200px), -50px) rotate(360deg)`;
+                
+                // Pig Defeat Animation
+                setTimeout(() => {
+                    enemy.style.transition = 'all 0.5s';
+                    enemy.style.transform = 'translateY(100px) rotate(180deg) scale(0)';
+                    enemy.style.opacity = '0';
+                    createParticles(enemy.getBoundingClientRect());
+                }, 300);
+
+                setTimeout(() => showFeedback(true), 800);
+            } else {
+                state.streak = 0;
+                
+                // Bird Fail Animation (falls down)
+                birdSvg.style.transition = 'transform 0.5s ease-in';
+                birdSvg.style.transform = `translateY(100px) rotate(-90deg)`;
+                
+                // Pig Laugh Animation (simple jump)
+                enemy.style.transition = 'transform 0.2s';
+                enemy.style.transform = 'translateY(-20px)';
+                setTimeout(() => enemy.style.transform = 'translateY(0)', 200);
+                setTimeout(() => enemy.style.transform = 'translateY(-20px)', 400);
+                setTimeout(() => enemy.style.transform = 'translateY(0)', 600);
+
+                setTimeout(() => showFeedback(false, qData.a), 1000);
+            }
+        }
+
+        function showFeedback(isCorrect, correctAnswer = "") {
+            const overlay = document.getElementById('feedback-overlay');
+            const panel = document.getElementById('feedback-panel');
+            const title = document.getElementById('feedback-title');
+            const rewardCoins = document.getElementById('reward-coins');
+            const rewardGem = document.getElementById('reward-gem-container');
+            const rewardPearl = document.getElementById('reward-pearl-container');
+            const rewardLeaf = document.getElementById('reward-leaf-container');
+            
+            overlay.classList.remove('hidden');
+            // Trigger animation
+            panel.classList.remove('scale-0');
+            panel.classList.add('scale-100');
+            
+            rewardGem.classList.add('hidden');
+            rewardPearl.classList.add('hidden');
+            rewardLeaf.classList.add('hidden');
+
+            if (isCorrect) {
+                title.innerText = "正確!";
+                title.className = "angry-font text-5xl mb-4 text-green-400";
+                
+                let coinsEarned = 10 + (state.streak > 1 ? 5 : 0); // Bonus for streak
+                state.coins += coinsEarned;
+                rewardCoins.innerText = `+${coinsEarned}`;
+                
+                // Chance for gem if streak is high
+                if (state.streak >= 3 && Math.random() > 0.5) {
+                    state.gems += 1;
+                    rewardGem.classList.remove('hidden');
+                }
+                
+                // Chance for pearl if streak is very high
+                if (state.streak >= 5 && Math.random() > 0.7) {
+                    state.pearls += 1;
+                    rewardPearl.classList.remove('hidden');
+                }
+
+                // Chance for leaf if streak is >= 2
+                if (state.streak >= 2 && Math.random() > 0.4) {
+                    state.leaves += 1;
+                    rewardLeaf.classList.remove('hidden');
+                }
+            } else {
+                title.innerHTML = `錯誤!<br><span class="text-2xl mt-2 block text-gray-200">正確答案: ${correctAnswer}</span>`;
+                title.className = "angry-font text-5xl mb-4 text-red-500 text-center";
+                
+                state.coins += 2; // consolation prize
+                rewardCoins.innerText = "+2";
+            }
+            
+            updateHUD();
+        }
+
+        function nextQuestion() {
+            const overlay = document.getElementById('feedback-overlay');
+            const panel = document.getElementById('feedback-panel');
+            
+            panel.classList.remove('scale-100');
+            panel.classList.add('scale-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                
+                state.currentQuestionIndex++;
+                saveSession();
+                
+                if (state.currentQuestionIndex < state.totalQuestions) {
+                    loadQuestion();
+                } else {
+                    showEndScreen();
+                }
+            }, 300);
+        }
+
+        function showEndScreen() {
+            const total = state.totalQuestions;
+            
+            // Final Progress Update
+            document.getElementById('progress-bar').style.width = `100%`;
+            document.getElementById('progress-text').innerText = `${total} / ${total}`;
+
+            // Show result screen
+            showScreen('result');
+
+            const starsContainer = document.getElementById('result-stars');
+            const scoreText = document.getElementById('result-score');
+            const newBirdAlert = document.getElementById('new-bird-alert');
+            const newBirdSvg = document.getElementById('unlocked-bird-svg');
+            const reviewList = document.getElementById('review-list');
+            
+            scoreText.innerText = `得分: ${state.score} / ${total}`;
+            
+            // Calculate stars (3 max based on percentage)
+            let stars = 0;
+            const scorePct = state.score / total;
+            if (scorePct === 1) stars = 3; // 100%
+            else if (scorePct >= 0.7) stars = 2; // ~70%+
+            else if (scorePct >= 0.4) stars = 1; // ~40%+
+            
+            starsContainer.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                const star = document.createElement('div');
+                star.innerHTML = `<svg viewBox="0 0 100 100" class="w-16 h-16 ${i < stars ? '' : 'grayscale opacity-30'} pop-in" style="animation-delay: ${i*0.2}s">
+                    <polygon points="50,10 61,39 92,39 67,58 76,89 50,71 24,89 33,58 8,39 39,39" fill="#ffcc00" stroke="#cc9900" stroke-width="2"/>
+                </svg>`;
+                starsContainer.appendChild(star);
+            }
+
+            // Big rewards
+            const coinsEarned = state.score * 5;
+            let gemsEarned = 0;
+            let pearlsEarned = 0;
+            let leavesEarned = 0;
+            
+            if (stars === 3) {
+                gemsEarned = 2;
+                pearlsEarned = 1; // Guaranteed pearl for perfect score
+                leavesEarned = 5; // Bonus leaves for perfect score
+            }
+            else if (stars >= 1) {
+                gemsEarned = 1;
+                leavesEarned = stars * 2;
+            }
+            
+            state.coins += coinsEarned;
+            state.gems += gemsEarned;
+            state.pearls += pearlsEarned;
+            state.leaves += leavesEarned;
+            
+            // Show rewards earned
+            document.getElementById('result-coins-earned').innerText = `+${coinsEarned}`;
+            const gemContainer = document.getElementById('result-gem-container');
+            if (gemsEarned > 0) {
+                gemContainer.classList.remove('hidden');
+                document.getElementById('result-gems-earned').innerText = `+${gemsEarned}`;
+            } else {
+                gemContainer.classList.add('hidden');
+            }
+            
+            const pearlContainer = document.getElementById('result-pearl-container');
+            if (pearlsEarned > 0) {
+                pearlContainer.classList.remove('hidden');
+                document.getElementById('result-pearls-earned').innerText = `+${pearlsEarned}`;
+            } else {
+                pearlContainer.classList.add('hidden');
+            }
+            
+            const leafContainer = document.getElementById('result-leaf-container');
+            if (leavesEarned > 0) {
+                leafContainer.classList.remove('hidden');
+                document.getElementById('result-leaves-earned').innerText = `+${leavesEarned}`;
+            } else {
+                leafContainer.classList.add('hidden');
+            }
+            
+            updateHUD();
+            newBirdAlert.classList.add('hidden');
+
+            // Populate Review List
+            reviewList.innerHTML = '';
+            state.userAnswers.forEach((ans, idx) => {
+                const item = document.createElement('div');
+                item.className = `p-4 rounded-xl border-2 ${ans.isCorrect ? 'bg-green-100 border-green-400' : 'bg-red-100 border-red-400'}`;
+                
+                // Replace __________ with the answer text
+                let qText = ans.question.replace('__________', `<span class="font-bold underline ${ans.isCorrect ? 'text-green-700' : 'text-red-600'}">${ans.selected}</span>`);
+                
+                let explanationHTML = '';
+                if (!ans.isCorrect) {
+                    explanationHTML = `<div class="mt-2 text-sm font-bold text-gray-700">正確答案：<span class="text-green-600">${ans.correct}</span></div>`;
+                }
+
+                item.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="font-bold text-lg w-6 flex-shrink-0 text-gray-700">${idx + 1}.</div>
+                        <div class="flex-grow">
+                            <p class="text-gray-900 text-lg leading-relaxed font-medium">${qText}</p>
+                            ${explanationHTML}
+                        </div>
+                        <div class="ml-auto text-3xl font-bold ${ans.isCorrect ? 'text-green-500' : 'text-red-500'}">
+                            ${ans.isCorrect ? '✓' : '✗'}
+                        </div>
+                    </div>
+                `;
+                reviewList.appendChild(item);
+            });
+
+            // Unlock bird logic (e.g., if passing with >= 70%)
+            if (scorePct >= 0.7) {
+                const unlocked = unlockRandomBird();
+                if (unlocked) {
+                    setTimeout(() => {
+                        newBirdSvg.innerHTML = `<use href="#${unlocked}"></use>`;
+                        if (state.equippedHat !== 'none') {
+                            newBirdSvg.innerHTML += `<use href="#hat-${state.equippedHat}"></use>`;
+                        }
+                        newBirdAlert.classList.remove('hidden');
+                    }, 1000);
+                }
+            }
+        }
+
+        function createParticles(rect) {
+            const colors = ['#77cc33', '#559922', '#ffffff'];
+            for(let i=0; i<15; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle w-3 h-3 rounded-full absolute z-50';
+                p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const startX = rect.left + rect.width/2;
+                const startY = rect.top + rect.height/2;
+                
+                p.style.left = startX + 'px';
+                p.style.top = startY + 'px';
+                
+                document.body.appendChild(p);
+                
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                p.animate([
+                    { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: 500 + Math.random() * 300,
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                }).onfinish = () => p.remove();
+            }
+        }
+
+        // Parent Admin Hidden Functions
+        let secretClickCount = 0;
+        let secretClickTimer;
+
+        window.handleSecretClick = function() {
+            secretClickCount++;
+            clearTimeout(secretClickTimer);
+            // Reset click count if they stop clicking for 1 second
+            secretClickTimer = setTimeout(() => secretClickCount = 0, 1000);
+            
+            if (secretClickCount >= 5) {
+                window.openAdminModal();
+                secretClickCount = 0; // Reset after opening
+            }
+        };
+
+        window.openAdminModal = function() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            document.getElementById('admin-login-panel').classList.remove('hidden');
+            document.getElementById('admin-unlocked-panel').classList.add('hidden');
+            document.getElementById('admin-error').classList.add('hidden');
+            document.getElementById('admin-pin').value = '';
+        };
+
+        window.closeAdminModal = function() {
+            document.getElementById('admin-modal').classList.add('hidden');
+        };
+
+        window.verifyAdminPin = function() {
+            const pin = document.getElementById('admin-pin').value;
+            if (pin === '8888') {
+                document.getElementById('admin-login-panel').classList.add('hidden');
+                document.getElementById('admin-unlocked-panel').classList.remove('hidden');
+            } else {
+                document.getElementById('admin-error').classList.remove('hidden');
+            }
+        };
+
+        window.adminAddCurrency = function(type, amount) {
+            state[type] += amount;
+            updateHUD();
+        };
+
+        // Expose globally for inline event handlers
+        window.showScreen = showScreen;
+        window.startSet = startSet;
+        window.startExercise = startExercise;
+        window.nextQuestion = nextQuestion;
+        window.buyHat = buyHat;
+        window.buyBird = buyBird;
+        window.equipHat = equipHat;
+
+        // Firebase Initialization
+        async function initFirebase() {
+            if (Object.keys(firebaseConfig).length === 0) {
+                init();
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                userId = auth.currentUser?.uid;
+                
+                if (userId) {
+                    document.getElementById('user-id-display').innerText = `ID: ${userId}`;
+                    document.getElementById('user-info').classList.remove('hidden');
+                    await loadData();
+                }
+            } catch (error) {
+                console.error("Firebase auth/init error:", error);
+            }
+            init(); // Start game
+        }
+
+        async function loadData() {
+            if (!userId || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'playerState', 'data');
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    state.coins = data.coins ?? state.coins;
+                    state.gems = data.gems ?? state.gems;
+                    state.pearls = data.pearls ?? state.pearls;
+                    state.leaves = data.leaves ?? state.leaves;
+                    if (data.unlockedBirds) state.unlockedBirds = data.unlockedBirds;
+                    state.catHatUnlocked = data.catHatUnlocked || false;
+                    state.dogHatUnlocked = data.dogHatUnlocked || false;
+                    state.transformerHatUnlocked = data.transformerHatUnlocked || false;
+                    state.shadesHatUnlocked = data.shadesHatUnlocked || false;
+                    state.equippedHat = data.equippedHat || 'none';
+                }
+            } catch (error) {
+                console.error("Error loading data:", error);
+            }
+        }
+
+        async function saveData() {
+            if (!userId || !db) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'playerState', 'data');
+                await setDoc(docRef, {
+                    coins: state.coins,
+                    gems: state.gems,
+                    pearls: state.pearls,
+                    leaves: state.leaves,
+                    unlockedBirds: state.unlockedBirds,
+                    catHatUnlocked: state.catHatUnlocked,
+                    dogHatUnlocked: state.dogHatUnlocked,
+                    transformerHatUnlocked: state.transformerHatUnlocked,
+                    shadesHatUnlocked: state.shadesHatUnlocked,
+                    equippedHat: state.equippedHat
+                });
+            } catch (error) {
+                console.error("Error saving data:", error);
+            }
+        }
+
+        // Initialize on load
+        window.onload = initFirebase;
+    </script>
+</body>
+</html>

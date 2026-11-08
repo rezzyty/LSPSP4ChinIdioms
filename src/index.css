@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+}
+
+.angry-font {
+  font-family: 'ZCOOL KuaiLe', 'Noto Sans TC', sans-serif;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* Wood panel with authentic grain */
+.wood-panel {
+  background-color: #d2b48c;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.05) 10px,
+    rgba(0, 0, 0, 0.05) 20px
+  );
+  border: 4px solid #8b4513;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4), 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 3D Game button with tactile press */
+.btn-game {
+  background: linear-gradient(to bottom, #ff5252, #cc0000);
+  border: 3px solid #7f1d1d;
+  box-shadow: 0 5px 0 #7f1d1d, 0 8px 12px rgba(0, 0, 0, 0.35);
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-game:hover {
+  filter: brightness(1.06);
+}
+
+.btn-game:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 #7f1d1d, 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* Option buttons tailored for iPad Pro 13" and mobile touch */
+.btn-option {
+  background: linear-gradient(to bottom, #ffffff, #f1f5f9);
+  border: 3px solid #94a3b8;
+  box-shadow: 0 6px 0 #64748b, 0 8px 15px rgba(0, 0, 0, 0.15);
+  color: #1e293b;
+  transition: all 0.1s ease-in-out;
+}
+
+.btn-option:hover {
+  background: linear-gradient(to bottom, #ffffff, #e2e8f0);
+}
+
+.btn-option:active {
+  transform: translateY(4px);
+  box-shadow: 0 2px 0 #64748b, 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-option.correct {
+  background: linear-gradient(to bottom, #86efac, #22c55e) !important;
+  border-color: #15803d !important;
+  box-shadow: 0 6px 0 #14532d !important;
+  color: #052e16 !important;
+}
+
+.btn-option.wrong {
+  background: linear-gradient(to bottom, #fca5a5, #ef4444) !important;
+  border-color: #b91c1c !important;
+  box-shadow: 0 6px 0 #7f1d1d !important;
+  color: #450a0a !important;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 3.5s ease-in-out infinite;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pop-in {
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}

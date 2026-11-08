@@ -1,0 +1,7 @@
+{
+  "name": "成語保衛戰：憤怒鳥大挑戰",
+  "description": "香港四年級中文成語學習遊戲，支援 Melaine、Jayden 及訪客多帳號、iPad Pro 13 吋大字觸控優化、憤怒鳥角色、背景主題與武器道具強化系統！",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
